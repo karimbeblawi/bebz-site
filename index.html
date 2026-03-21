@@ -1,106 +1,136 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Bebz TV</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Link Your Device</title>
+
   <style>
     body {
-      margin: 0;
-      background: #0b0f1a;
-      color: white;
       font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 60px 20px;
+      background: #0b1220;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
-    .box {
-      max-width: 640px;
-      margin: 0 auto;
-      background: rgba(255,255,255,0.04);
-      border-radius: 14px;
-      padding: 32px 24px;
+
+    .card {
+      background: #121a2b;
+      padding: 30px;
+      border-radius: 12px;
+      width: 320px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
     }
+
     h1 {
-      margin-top: 0;
-      font-size: 40px;
+      font-size: 20px;
+      margin-bottom: 20px;
+      text-align: center;
     }
-    p {
-      color: #cfd6e6;
-      line-height: 1.6;
-    }
+
     input {
       width: 100%;
-      box-sizing: border-box;
-      margin: 10px 0;
-      padding: 12px 14px;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 6px;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      outline: none;
+      background: #1c253a;
+      color: white;
     }
+
     button {
       width: 100%;
-      margin-top: 14px;
-      padding: 12px 18px;
-      background: #3B82F6;
-      color: white;
-      text-decoration: none;
+      padding: 10px;
+      background: #3b82f6;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
       cursor: pointer;
     }
-    .msg {
-      margin-top: 18px;
-      min-height: 24px;
-      color: #cfd6e6;
+
+    button:hover {
+      background: #2563eb;
     }
-    .small {
+
+    #msg {
+      margin-top: 12px;
       font-size: 14px;
-      color: #9aa6c1;
+      text-align: center;
+      color: #9ca3af;
     }
   </style>
 </head>
+
 <body>
-  <div class="box">
-    <h1>Bebz TV</h1>
-    <p>Link your device and send your playlist once.</p>
-    <p class="small">We do not provide content. Use your own playlist only.</p>
+  <div class="card">
+    <h1>Link Your TV</h1>
 
     <form id="linkForm">
       <input id="device_id" placeholder="Device ID" required />
-      <input id="playlist_name" placeholder="Playlist Name (example: My IPTV)" />
-      <input id="playlist_url" placeholder="Playlist URL" required />
-      <input id="username" placeholder="Username (optional)" />
-      <input id="password" placeholder="Password (optional)" />
+      <input id="playlist_name" placeholder="Playlist Name (optional)" />
+      <input id="playlist_url" placeholder="Portal URL (http://example.com:8080)" required />
+      <input id="username" placeholder="Username" required />
+      <input id="password" placeholder="Password" required />
       <button type="submit">Link Device</button>
     </form>
 
-    <div id="msg" class="msg"></div>
+    <div id="msg"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = 'https://qsmuvkwhrzbydncdiphu.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_GXoX0HbGSg4njByYEmRPAw_B7sRBLDI';
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const form = document.getElementById('linkForm');
     const msg = document.getElementById('msg');
 
+    const deviceIdInput = document.getElementById('device_id');
+    const playlistNameInput = document.getElementById('playlist_name');
+    const playlistUrlInput = document.getElementById('playlist_url');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name) || '';
+    }
+
+    // 🔥 Auto-fill device ID from QR
+    const codeFromUrl = getQueryParam('code').trim().toUpperCase();
+    if (codeFromUrl !== '') {
+      deviceIdInput.value = codeFromUrl;
+    }
+
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
       msg.textContent = 'Sending...';
 
       const payload = {
-        device_id: document.getElementById('device_id').value.trim(),
-        playlist_name: document.getElementById('playlist_name').value.trim(),
-        playlist_url: document.getElementById('playlist_url').value.trim(),
-        username: document.getElementById('username').value.trim(),
-        password: document.getElementById('password').value.trim()
+        device_id: deviceIdInput.value.trim().toUpperCase(),
+        playlist_name: playlistNameInput.value.trim(),
+        playlist_url: playlistUrlInput.value.trim(),
+        username: usernameInput.value.trim(),
+        password: passwordInput.value.trim()
       };
 
       if (!payload.device_id || !payload.playlist_url) {
-        msg.textContent = 'Device ID and Playlist URL are required.';
+        msg.textContent = 'Device ID and Portal URL are required.';
+        return;
+      }
+
+      if (
+        !payload.playlist_url.startsWith('http://') &&
+        !payload.playlist_url.startsWith('https://')
+      ) {
+        msg.textContent = 'Portal URL must start with http:// or https://';
         return;
       }
 
@@ -114,7 +144,13 @@
       }
 
       msg.textContent = 'Success. Return to your TV.';
+
       form.reset();
+
+      // keep device id if QR was used
+      if (codeFromUrl !== '') {
+        deviceIdInput.value = codeFromUrl;
+      }
     });
   </script>
 </body>
