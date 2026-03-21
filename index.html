@@ -5,37 +5,117 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
+      margin: 0;
       background: #0b0f1a;
       color: white;
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       text-align: center;
-      padding-top: 100px;
+      padding: 60px 20px;
+    }
+    .box {
+      max-width: 640px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.04);
+      border-radius: 14px;
+      padding: 32px 24px;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 40px;
+    }
+    p {
+      color: #cfd6e6;
+      line-height: 1.6;
     }
     input {
-      padding: 12px;
-      width: 280px;
-      margin: 10px;
-      border-radius: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      margin: 10px 0;
+      padding: 12px 14px;
       border: none;
+      border-radius: 10px;
+      font-size: 16px;
     }
     button {
-      padding: 12px 20px;
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px 18px;
       background: #3B82F6;
       color: white;
+      text-decoration: none;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
+      font-size: 16px;
       cursor: pointer;
+    }
+    .msg {
+      margin-top: 18px;
+      min-height: 24px;
+      color: #cfd6e6;
+    }
+    .small {
+      font-size: 14px;
+      color: #9aa6c1;
     }
   </style>
 </head>
 <body>
+  <div class="box">
+    <h1>Bebz TV</h1>
+    <p>Link your device and send your playlist once.</p>
+    <p class="small">We do not provide content. Use your own playlist only.</p>
 
-<h1>Bebz TV</h1>
-<p>Enter your device ID and playlist</p>
+    <form id="linkForm">
+      <input id="device_id" placeholder="Device ID" required />
+      <input id="playlist_name" placeholder="Playlist Name (example: My IPTV)" />
+      <input id="playlist_url" placeholder="Playlist URL" required />
+      <input id="username" placeholder="Username (optional)" />
+      <input id="password" placeholder="Password (optional)" />
+      <button type="submit">Link Device</button>
+    </form>
 
-<input placeholder="Device ID" /><br>
-<input placeholder="Playlist URL" /><br>
-<button>Activate</button>
+    <div id="msg" class="msg"></div>
+  </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://qsmuvkwhrzbydncdiphu.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_GXoX0HbGSg4njByYEmRPAw_B7sRBLDI';
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const form = document.getElementById('linkForm');
+    const msg = document.getElementById('msg');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      msg.textContent = 'Sending...';
+
+      const payload = {
+        device_id: document.getElementById('device_id').value.trim(),
+        playlist_name: document.getElementById('playlist_name').value.trim(),
+        playlist_url: document.getElementById('playlist_url').value.trim(),
+        username: document.getElementById('username').value.trim(),
+        password: document.getElementById('password').value.trim()
+      };
+
+      if (!payload.device_id || !payload.playlist_url) {
+        msg.textContent = 'Device ID and Playlist URL are required.';
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from('device_links')
+        .insert([payload]);
+
+      if (error) {
+        msg.textContent = 'Error: ' + error.message;
+        return;
+      }
+
+      msg.textContent = 'Success. Return to your TV.';
+      form.reset();
+    });
+  </script>
 </body>
 </html>
