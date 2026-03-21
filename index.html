@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Link Your Device</title>
+  <title>Bebz TV</title>
 
   <style>
     body {
@@ -13,71 +13,204 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
     }
 
     .card {
       background: #121a2b;
-      padding: 30px;
-      border-radius: 12px;
-      width: 320px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      padding: 28px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 0 24px rgba(0,0,0,0.35);
+      box-sizing: border-box;
     }
 
     h1 {
-      font-size: 20px;
-      margin-bottom: 20px;
+      font-size: 24px;
+      margin: 0 0 10px 0;
       text-align: center;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin: 0 0 18px 0;
+      text-align: center;
+      color: #cbd5e1;
+      font-weight: normal;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 13px;
+      color: #94a3b8;
+      margin: 10px 0 6px;
     }
 
     input {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 12px;
-      border-radius: 6px;
+      padding: 11px 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
       border: none;
       outline: none;
       background: #1c253a;
       color: white;
+      box-sizing: border-box;
+      font-size: 15px;
     }
 
-    button {
+    .button {
       width: 100%;
-      padding: 10px;
+      padding: 11px 12px;
       background: #3b82f6;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       color: white;
       font-weight: bold;
       cursor: pointer;
+      margin-top: 8px;
+      font-size: 15px;
     }
 
-    button:hover {
+    .button:hover {
       background: #2563eb;
     }
 
+    .button.secondary {
+      background: #1e293b;
+    }
+
+    .button.secondary:hover {
+      background: #334155;
+    }
+
+    .info-row {
+      background: #1c253a;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+
+    .info-value {
+      font-size: 15px;
+      color: white;
+      word-break: break-word;
+    }
+
     #msg {
-      margin-top: 12px;
+      margin-top: 14px;
       font-size: 14px;
       text-align: center;
       color: #9ca3af;
+      min-height: 20px;
+    }
+
+    .top-note {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 13px;
+      margin-bottom: 18px;
+      line-height: 1.4;
     }
   </style>
 </head>
 
 <body>
   <div class="card">
-    <h1>Link Your TV</h1>
+    <h1>Bebz TV</h1>
+    <h2 id="screenSubtitle">Link your device</h2>
 
-    <form id="linkForm">
-      <input id="device_id" placeholder="Device ID" required />
-      <input id="playlist_name" placeholder="Playlist Name (optional)" />
-      <input id="playlist_url" placeholder="Portal URL (http://example.com:8080)" required />
-      <input id="username" placeholder="Username" required />
-      <input id="password" placeholder="Password" required />
-      <button type="submit">Link Device</button>
-    </form>
+    <!-- SCREEN 1: LINK DEVICE -->
+    <div id="screen1">
+      <div class="top-note">
+        Scan the QR code from your TV or enter your Device ID manually.
+      </div>
+
+      <label class="field-label" for="device_id">Device ID</label>
+      <input id="device_id" placeholder="Enter Device ID" />
+
+      <button id="linkDeviceBtn" class="button">Link Device</button>
+    </div>
+
+    <!-- SCREEN 2: DEVICE DASHBOARD -->
+    <div id="screen2" class="hidden">
+      <div class="info-row">
+        <div class="info-label">Device ID</div>
+        <div id="dashboardDeviceId" class="info-value"></div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">Status</div>
+        <div id="dashboardStatus" class="info-value">Inactive</div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">Expiry Date</div>
+        <div id="dashboardExpiry" class="info-value">--</div>
+      </div>
+
+      <button id="goActivateBtn" class="button">Activate Device</button>
+      <button id="goAddPlaylistBtn" class="button secondary">Add Playlist</button>
+      <button id="backToLinkBtn" class="button secondary">Back</button>
+    </div>
+
+    <!-- SCREEN 3A: ACTIVATE DEVICE -->
+    <div id="screen3a" class="hidden">
+      <div class="info-row">
+        <div class="info-label">Device ID</div>
+        <div id="activateDeviceId" class="info-value"></div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">Status</div>
+        <div id="activateStatus" class="info-value">Inactive</div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">Expiry Date</div>
+        <div id="activateExpiry" class="info-value">--</div>
+      </div>
+
+      <button id="activateBtn" class="button">Activate</button>
+      <button id="backToDashboardFromActivateBtn" class="button secondary">Back</button>
+    </div>
+
+    <!-- SCREEN 3B: ADD PLAYLIST -->
+    <div id="screen3b" class="hidden">
+      <div class="info-row">
+        <div class="info-label">Device ID</div>
+        <div id="playlistDeviceId" class="info-value"></div>
+      </div>
+
+      <label class="field-label" for="playlist_name">Playlist Name</label>
+      <input id="playlist_name" placeholder="My Playlist (optional)" />
+
+      <label class="field-label" for="playlist_url">Portal URL</label>
+      <input id="playlist_url" placeholder="http://example.com:8080" />
+
+      <label class="field-label" for="username">Username</label>
+      <input id="username" placeholder="Username" />
+
+      <label class="field-label" for="password">Password</label>
+      <input id="password" placeholder="Password" />
+
+      <button id="addPlaylistBtn" class="button">Add Playlist</button>
+      <button id="backToDashboardFromPlaylistBtn" class="button secondary">Back</button>
+    </div>
 
     <div id="msg"></div>
   </div>
@@ -89,40 +222,161 @@
 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const form = document.getElementById('linkForm');
-    const msg = document.getElementById('msg');
+    // Screens
+    const screen1 = document.getElementById('screen1');
+    const screen2 = document.getElementById('screen2');
+    const screen3a = document.getElementById('screen3a');
+    const screen3b = document.getElementById('screen3b');
+    const screenSubtitle = document.getElementById('screenSubtitle');
 
+    // Screen 1
     const deviceIdInput = document.getElementById('device_id');
+    const linkDeviceBtn = document.getElementById('linkDeviceBtn');
+
+    // Screen 2
+    const dashboardDeviceId = document.getElementById('dashboardDeviceId');
+    const dashboardStatus = document.getElementById('dashboardStatus');
+    const dashboardExpiry = document.getElementById('dashboardExpiry');
+    const goActivateBtn = document.getElementById('goActivateBtn');
+    const goAddPlaylistBtn = document.getElementById('goAddPlaylistBtn');
+    const backToLinkBtn = document.getElementById('backToLinkBtn');
+
+    // Screen 3A
+    const activateDeviceId = document.getElementById('activateDeviceId');
+    const activateStatus = document.getElementById('activateStatus');
+    const activateExpiry = document.getElementById('activateExpiry');
+    const activateBtn = document.getElementById('activateBtn');
+    const backToDashboardFromActivateBtn = document.getElementById('backToDashboardFromActivateBtn');
+
+    // Screen 3B
+    const playlistDeviceId = document.getElementById('playlistDeviceId');
     const playlistNameInput = document.getElementById('playlist_name');
     const playlistUrlInput = document.getElementById('playlist_url');
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
+    const addPlaylistBtn = document.getElementById('addPlaylistBtn');
+    const backToDashboardFromPlaylistBtn = document.getElementById('backToDashboardFromPlaylistBtn');
+
+    const msg = document.getElementById('msg');
+
+    let currentDeviceId = '';
+    let currentStatus = 'Inactive';
+    let currentExpiry = '--';
+
+    function showScreen(name) {
+      screen1.classList.add('hidden');
+      screen2.classList.add('hidden');
+      screen3a.classList.add('hidden');
+      screen3b.classList.add('hidden');
+      msg.textContent = '';
+
+      if (name === 'screen1') {
+        screen1.classList.remove('hidden');
+        screenSubtitle.textContent = 'Link your device';
+      } else if (name === 'screen2') {
+        screen2.classList.remove('hidden');
+        screenSubtitle.textContent = 'Device dashboard';
+      } else if (name === 'screen3a') {
+        screen3a.classList.remove('hidden');
+        screenSubtitle.textContent = 'Activate device';
+      } else if (name === 'screen3b') {
+        screen3b.classList.remove('hidden');
+        screenSubtitle.textContent = 'Add playlist';
+      }
+    }
 
     function getQueryParam(name) {
       const params = new URLSearchParams(window.location.search);
       return params.get(name) || '';
     }
 
-    // 🔥 Auto-fill device ID from QR
-    const codeFromUrl = getQueryParam('code').trim().toUpperCase();
+    function normalizeDeviceId(value) {
+      return (value || '').trim().toUpperCase();
+    }
+
+    function setCurrentDevice(deviceId) {
+      currentDeviceId = normalizeDeviceId(deviceId);
+
+      dashboardDeviceId.textContent = currentDeviceId;
+      dashboardStatus.textContent = currentStatus;
+      dashboardExpiry.textContent = currentExpiry;
+
+      activateDeviceId.textContent = currentDeviceId;
+      activateStatus.textContent = currentStatus;
+      activateExpiry.textContent = currentExpiry;
+
+      playlistDeviceId.textContent = currentDeviceId;
+    }
+
+    // For now this is placeholder logic.
+    // Later you can fetch real status from a "devices" table or backend.
+    async function loadDeviceDashboard(deviceId) {
+      currentStatus = 'Inactive';
+      currentExpiry = '--';
+      setCurrentDevice(deviceId);
+    }
+
+    // QR autofill
+    const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
     if (codeFromUrl !== '') {
       deviceIdInput.value = codeFromUrl;
     }
 
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
+    linkDeviceBtn.addEventListener('click', async function () {
+      const deviceId = normalizeDeviceId(deviceIdInput.value);
+
+      if (!deviceId) {
+        msg.textContent = 'Please enter a Device ID.';
+        return;
+      }
+
+      await loadDeviceDashboard(deviceId);
+      showScreen('screen2');
+    });
+
+    backToLinkBtn.addEventListener('click', function () {
+      showScreen('screen1');
+      deviceIdInput.value = currentDeviceId;
+    });
+
+    goActivateBtn.addEventListener('click', function () {
+      showScreen('screen3a');
+    });
+
+    goAddPlaylistBtn.addEventListener('click', function () {
+      showScreen('screen3b');
+    });
+
+    backToDashboardFromActivateBtn.addEventListener('click', function () {
+      showScreen('screen2');
+    });
+
+    backToDashboardFromPlaylistBtn.addEventListener('click', function () {
+      showScreen('screen2');
+    });
+
+    activateBtn.addEventListener('click', function () {
+      msg.textContent = 'Activation flow will be added next.';
+    });
+
+    addPlaylistBtn.addEventListener('click', async function () {
       msg.textContent = 'Sending...';
 
       const payload = {
-        device_id: deviceIdInput.value.trim().toUpperCase(),
+        device_id: currentDeviceId,
         playlist_name: playlistNameInput.value.trim(),
         playlist_url: playlistUrlInput.value.trim(),
         username: usernameInput.value.trim(),
         password: passwordInput.value.trim()
       };
 
-      if (!payload.device_id || !payload.playlist_url) {
-        msg.textContent = 'Device ID and Portal URL are required.';
+      if (!payload.device_id) {
+        msg.textContent = 'Missing Device ID.';
+        return;
+      }
+
+      if (!payload.playlist_url || !payload.username || !payload.password) {
+        msg.textContent = 'Portal URL, Username, and Password are required.';
         return;
       }
 
@@ -143,15 +397,15 @@
         return;
       }
 
-      msg.textContent = 'Success. Return to your TV.';
-
-      form.reset();
-
-      // keep device id if QR was used
-      if (codeFromUrl !== '') {
-        deviceIdInput.value = codeFromUrl;
-      }
+      msg.textContent = 'Playlist added successfully. Return to your TV.';
+      playlistNameInput.value = '';
+      playlistUrlInput.value = '';
+      usernameInput.value = '';
+      passwordInput.value = '';
     });
+
+    // Start on screen 1
+    showScreen('screen1');
   </script>
 </body>
 </html>
