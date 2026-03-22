@@ -500,7 +500,13 @@
 
       // Delete the row — TV never picked it up
       if (pendingLinkId) {
-        await sb.from('device_links').delete().eq('id', pendingLinkId);
+        const { error: delErr } = await sb
+          .from('device_links')
+          .delete()
+          .eq('id', Number(pendingLinkId));
+        if (delErr) {
+          console.error('Auto-delete failed:', delErr.message);
+        }
         pendingLinkId = null;
       }
 
