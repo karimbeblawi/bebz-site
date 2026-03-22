@@ -7,6 +7,8 @@
   <title>Bebz TV</title>
 
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -17,7 +19,6 @@
       align-items: center;
       min-height: 100vh;
       padding: 20px;
-      box-sizing: border-box;
     }
 
     .card {
@@ -26,33 +27,21 @@
       background: #121a2b;
       padding: 28px;
       border-radius: 14px;
-      box-shadow: 0 0 24px rgba(0, 0, 0, 0.45);
-      box-sizing: border-box;
+      box-shadow: 0 0 24px rgba(0,0,0,0.45);
     }
 
-    h1 {
-      margin: 0 0 8px 0;
-      font-size: 24px;
-      text-align: center;
-    }
-
-    h2 {
-      margin: 0 0 18px 0;
-      font-size: 20px;
-      text-align: center;
-    }
+    h1 { margin: 0 0 8px; font-size: 24px; text-align: center; }
+    h2 { margin: 0 0 18px; font-size: 20px; text-align: center; }
 
     p.sub {
-      margin: 0 0 22px 0;
+      margin: 0 0 22px;
       color: #9ca3af;
       text-align: center;
       font-size: 14px;
       line-height: 1.5;
     }
 
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none !important; }
 
     .field-label {
       font-size: 13px;
@@ -70,13 +59,10 @@
       outline: none;
       background: #1c253a;
       color: white;
-      box-sizing: border-box;
       font-size: 15px;
     }
 
-    input[readonly] {
-      opacity: 0.9;
-    }
+    input[readonly] { opacity: 0.9; cursor: default; }
 
     .info-box {
       background: #1c253a;
@@ -86,28 +72,43 @@
     }
 
     .info-row {
+      display: flex;
+      align-items: center;
       margin-bottom: 10px;
       font-size: 15px;
     }
-
-    .info-row:last-child {
-      margin-bottom: 0;
-    }
+    .info-row:last-child { margin-bottom: 0; }
 
     .info-label {
       color: #9ca3af;
-      display: inline-block;
       width: 110px;
+      flex-shrink: 0;
     }
 
+    /* Status pill with dynamic colours */
     .status-pill {
       display: inline-block;
       padding: 4px 10px;
       border-radius: 999px;
-      background: #2b3448;
       font-size: 13px;
+      font-weight: 600;
       text-transform: capitalize;
+      background: #2b3448;
+      color: #9ca3af;
     }
+    .status-pill.active     { background: #14532d; color: #4ade80; }
+    .status-pill.free_trial { background: #1e3a5f; color: #60a5fa; }
+    .status-pill.expired    { background: #450a0a; color: #f87171; }
+    .status-pill.inactive   { background: #2b3448; color: #9ca3af; }
+
+    /* Expiry countdown badge */
+    .expiry-note {
+      font-size: 12px;
+      color: #60a5fa;
+      margin-left: 8px;
+    }
+    .expiry-note.warn { color: #f59e0b; }
+    .expiry-note.over { color: #f87171; }
 
     button {
       width: 100%;
@@ -120,19 +121,16 @@
       font-size: 15px;
       cursor: pointer;
       margin-bottom: 12px;
+      transition: background 0.15s;
     }
+    button:hover  { background: #2563eb; }
+    button:disabled { background: #1e3a5f; color: #4b6a9a; cursor: not-allowed; }
 
-    button:hover {
-      background: #2563eb;
-    }
+    button.secondary           { background: #263248; }
+    button.secondary:hover     { background: #334155; }
+    button.secondary:disabled  { background: #1a2233; color: #4b6a9a; cursor: not-allowed; }
 
-    button.secondary {
-      background: #263248;
-    }
-
-    button.secondary:hover {
-      background: #334155;
-    }
+    button.success { background: #15803d; }
 
     #msg {
       margin-top: 10px;
@@ -142,6 +140,8 @@
       min-height: 20px;
       line-height: 1.4;
     }
+    #msg.error   { color: #f87171; }
+    #msg.success { color: #4ade80; }
 
     .small-note {
       color: #9ca3af;
@@ -150,361 +150,409 @@
       text-align: center;
       margin-top: 8px;
     }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #1e293b;
+      margin: 16px 0;
+    }
   </style>
 </head>
 
 <body>
-  <div class="card">
-    <section id="screen-link">
-      <h1>Bebz TV</h1>
-      <p class="sub">
-        Link your device first, then activate it or add a playlist.
-      </p>
+<div class="card">
 
-      <label class="field-label" for="device_id_link">Device ID</label>
-      <input id="device_id_link" placeholder="Enter Device ID" />
+  <!-- ── SCREEN: Link ── -->
+  <section id="screen-link">
+    <h1>Bebz TV</h1>
+    <p class="sub">Link your device first, then activate it or add a playlist.</p>
 
-      <button id="btnLinkDevice">Link Device</button>
+    <label class="field-label" for="device_id_link">Device ID</label>
+    <input id="device_id_link" placeholder="Enter Device ID (e.g. AB3X9K…)" autocomplete="off" />
 
-      <div class="small-note">
-        You can type the Device ID manually, or scan the QR code shown on your TV.
+    <button id="btnLinkDevice">Link Device</button>
+
+    <div class="small-note">Type the Device ID manually, or scan the QR code shown on your TV.</div>
+  </section>
+
+  <!-- ── SCREEN: Dashboard ── -->
+  <section id="screen-dashboard" class="hidden">
+    <h2>Device Dashboard</h2>
+
+    <div class="info-box">
+      <div class="info-row">
+        <span class="info-label">Device ID</span>
+        <span id="dashDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
       </div>
-    </section>
-
-    <section id="screen-dashboard" class="hidden">
-      <h2>Device Dashboard</h2>
-
-      <div class="info-box">
-        <div class="info-row">
-          <span class="info-label">Device ID</span>
-          <span id="dashDeviceId"></span>
-        </div>
-
-        <div class="info-row">
-          <span class="info-label">Status</span>
-          <span id="dashStatus" class="status-pill">Inactive</span>
-        </div>
-
-        <div class="info-row">
-          <span class="info-label">Expiry</span>
-          <span id="dashExpiry">-</span>
-        </div>
+      <div class="info-row">
+        <span class="info-label">Status</span>
+        <span id="dashStatus" class="status-pill inactive">inactive</span>
       </div>
-
-      <button id="btnGoActivate">Activate Device</button>
-      <button id="btnGoPlaylist" class="secondary">Add Playlist</button>
-      <button id="btnBackToLink" class="secondary">Back</button>
-    </section>
-
-    <section id="screen-activate" class="hidden">
-      <h2>Activate Device</h2>
-
-      <div class="info-box">
-        <div class="info-row">
-          <span class="info-label">Device ID</span>
-          <span id="activateDeviceId"></span>
-        </div>
-
-        <div class="info-row">
-          <span class="info-label">Status</span>
-          <span id="activateStatus" class="status-pill">Inactive</span>
-        </div>
-
-        <div class="info-row">
-          <span class="info-label">Expiry</span>
-          <span id="activateExpiry">-</span>
-        </div>
+      <div class="info-row">
+        <span class="info-label">Expiry</span>
+        <span id="dashExpiry">—</span>
+        <span id="dashExpiryNote" class="expiry-note hidden"></span>
       </div>
+    </div>
 
-      <button id="btnActivateNow">Activate</button>
-      <button id="btnBackToDashboardA" class="secondary">Back</button>
+    <button id="btnGoActivate">Activate / Start Trial</button>
+    <button id="btnGoPlaylist" class="secondary">Add Playlist</button>
+    <hr class="divider" />
+    <button id="btnBackToLink" class="secondary">← Back</button>
+  </section>
 
-      <div class="small-note">
-        Activation backend comes next.
+  <!-- ── SCREEN: Activate ── -->
+  <section id="screen-activate" class="hidden">
+    <h2>Activate Device</h2>
+
+    <div class="info-box">
+      <div class="info-row">
+        <span class="info-label">Device ID</span>
+        <span id="activateDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
       </div>
-    </section>
-
-    <section id="screen-playlist" class="hidden">
-      <h2>Add Playlist</h2>
-
-      <label class="field-label" for="device_id_playlist">Device ID</label>
-      <input id="device_id_playlist" readonly />
-
-      <form id="playlistForm">
-        <label class="field-label" for="playlist_name">Playlist Name</label>
-        <input id="playlist_name" placeholder="My Playlist (optional)" />
-
-        <label class="field-label" for="playlist_url">Portal URL</label>
-        <input id="playlist_url" placeholder="http://example.com:8080" required />
-
-        <label class="field-label" for="username">Username</label>
-        <input id="username" placeholder="Username" required />
-
-        <label class="field-label" for="password">Password</label>
-        <input id="password" placeholder="Password" required />
-
-        <button type="submit">Add Playlist</button>
-      </form>
-
-      <button id="btnBackToDashboardB" class="secondary">Back</button>
-
-      <div class="small-note">
-        Adding a playlist does not delete existing playlists on the TV.
+      <div class="info-row">
+        <span class="info-label">Status</span>
+        <span id="activateStatus" class="status-pill inactive">inactive</span>
       </div>
-    </section>
+      <div class="info-row">
+        <span class="info-label">Expiry</span>
+        <span id="activateExpiry">—</span>
+      </div>
+    </div>
 
-    <div id="msg"></div>
-  </div>
+    <button id="btnActivateNow">Start 7-Day Free Trial</button>
+    <button id="btnBackToDashboardA" class="secondary">← Back</button>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = 'https://qsmuvkwhrzbydncdiphu.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_GXoX0HbGSg4njByYEmRPAw_B7sRBLDI';
+    <div class="small-note" id="activateNote">
+      Starting a trial sets your status to <strong>free_trial</strong> for 7 days.
+      Payment integration coming in Phase 2.
+    </div>
+  </section>
 
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <!-- ── SCREEN: Playlist ── -->
+  <section id="screen-playlist" class="hidden">
+    <h2>Add Playlist</h2>
 
-    const screenLink = document.getElementById('screen-link');
-    const screenDashboard = document.getElementById('screen-dashboard');
-    const screenActivate = document.getElementById('screen-activate');
-    const screenPlaylist = document.getElementById('screen-playlist');
+    <label class="field-label">Device ID</label>
+    <input id="device_id_playlist" readonly />
 
-    const msg = document.getElementById('msg');
+    <label class="field-label" for="playlist_name">Playlist Name</label>
+    <input id="playlist_name" placeholder="My Playlist (optional)" />
 
-    const deviceIdLinkInput = document.getElementById('device_id_link');
-    const deviceIdPlaylistInput = document.getElementById('device_id_playlist');
+    <label class="field-label" for="playlist_url">Portal URL</label>
+    <input id="playlist_url" placeholder="http://example.com:8080" />
 
-    const dashDeviceId = document.getElementById('dashDeviceId');
-    const dashStatus = document.getElementById('dashStatus');
-    const dashExpiry = document.getElementById('dashExpiry');
+    <label class="field-label" for="username">Username</label>
+    <input id="username" placeholder="Username" />
 
-    const activateDeviceId = document.getElementById('activateDeviceId');
-    const activateStatus = document.getElementById('activateStatus');
-    const activateExpiry = document.getElementById('activateExpiry');
+    <label class="field-label" for="password">Password</label>
+    <input id="password" placeholder="Password" type="password" />
 
-    const btnLinkDevice = document.getElementById('btnLinkDevice');
-    const btnGoActivate = document.getElementById('btnGoActivate');
-    const btnGoPlaylist = document.getElementById('btnGoPlaylist');
-    const btnBackToLink = document.getElementById('btnBackToLink');
-    const btnBackToDashboardA = document.getElementById('btnBackToDashboardA');
-    const btnBackToDashboardB = document.getElementById('btnBackToDashboardB');
-    const btnActivateNow = document.getElementById('btnActivateNow');
+    <button id="btnAddPlaylist">Add Playlist</button>
+    <button id="btnBackToDashboardB" class="secondary">← Back</button>
 
-    const playlistForm = document.getElementById('playlistForm');
-    const playlistNameInput = document.getElementById('playlist_name');
-    const playlistUrlInput = document.getElementById('playlist_url');
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
+    <div class="small-note">Adding a playlist does not remove existing playlists on the TV.</div>
+  </section>
 
-    let currentDeviceId = '';
-    let currentDeviceRow = null;
+  <div id="msg"></div>
+</div>
 
-    function showScreen(name) {
-      screenLink.classList.add('hidden');
-      screenDashboard.classList.add('hidden');
-      screenActivate.classList.add('hidden');
-      screenPlaylist.classList.add('hidden');
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ─────────────────────────────────────────────
+  // Config
+  // ─────────────────────────────────────────────
+  const SUPABASE_URL = 'https://qsmuvkwhrzbydncdiphu.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_GXoX0HbGSg4njByYEmRPAw_B7sRBLDI';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      if (name === 'link') screenLink.classList.remove('hidden');
-      if (name === 'dashboard') screenDashboard.classList.remove('hidden');
-      if (name === 'activate') screenActivate.classList.remove('hidden');
-      if (name === 'playlist') screenPlaylist.classList.remove('hidden');
+  const TRIAL_DAYS = 7;
+
+  // ─────────────────────────────────────────────
+  // State
+  // ─────────────────────────────────────────────
+  let currentDeviceId  = '';
+  let currentDeviceRow = null;
+
+  // ─────────────────────────────────────────────
+  // UI helpers
+  // ─────────────────────────────────────────────
+  const screens = {
+    link:      document.getElementById('screen-link'),
+    dashboard: document.getElementById('screen-dashboard'),
+    activate:  document.getElementById('screen-activate'),
+    playlist:  document.getElementById('screen-playlist'),
+  };
+
+  function showScreen(name) {
+    Object.values(screens).forEach(s => s.classList.add('hidden'));
+    screens[name].classList.remove('hidden');
+    setMsg('');
+  }
+
+  function setMsg(text, type = '') {
+    const el = document.getElementById('msg');
+    el.textContent = text || '';
+    el.className = type;
+  }
+
+  function setBtn(id, text, disabled = false) {
+    const b = document.getElementById(id);
+    b.textContent = text;
+    b.disabled = disabled;
+  }
+
+  // ─────────────────────────────────────────────
+  // Formatting
+  // ─────────────────────────────────────────────
+  function formatExpiry(value) {
+    if (!value) return '—';
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return value;
+    return d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+  }
+
+  function expiryCountdown(value) {
+    if (!value) return null;
+    const exp = new Date(value);
+    if (isNaN(exp.getTime())) return null;
+    const diffMs   = exp - Date.now();
+    const diffDays = Math.ceil(diffMs / 86400000);
+    if (diffDays < 0)  return { text: 'expired',            cls: 'over' };
+    if (diffDays === 0) return { text: 'expires today',     cls: 'warn' };
+    if (diffDays <= 3)  return { text: `${diffDays}d left`, cls: 'warn' };
+    return                     { text: `${diffDays}d left`, cls: '' };
+  }
+
+  function applyStatusPill(el, status) {
+    el.className = 'status-pill ' + (status || 'inactive');
+    el.textContent = (status || 'inactive').replace('_', ' ');
+  }
+
+  // ─────────────────────────────────────────────
+  // Dashboard population
+  // ─────────────────────────────────────────────
+  function populateDashboard(row) {
+    const id     = row.device_id   || '';
+    const status = row.status      || 'inactive';
+    const expiry = row.expiry_date || null;
+
+    // Dashboard screen
+    document.getElementById('dashDeviceId').textContent = id;
+    applyStatusPill(document.getElementById('dashStatus'), status);
+    document.getElementById('dashExpiry').textContent = formatExpiry(expiry);
+
+    const noteEl = document.getElementById('dashExpiryNote');
+    const cd = expiryCountdown(expiry);
+    if (cd) {
+      noteEl.textContent = '(' + cd.text + ')';
+      noteEl.className   = 'expiry-note ' + cd.cls;
+      noteEl.classList.remove('hidden');
+    } else {
+      noteEl.classList.add('hidden');
     }
 
-    function setMessage(text) {
-      msg.textContent = text || '';
+    // Activate screen mirrors
+    document.getElementById('activateDeviceId').textContent = id;
+    applyStatusPill(document.getElementById('activateStatus'), status);
+    document.getElementById('activateExpiry').textContent = formatExpiry(expiry);
+
+    // Playlist screen device id
+    document.getElementById('device_id_playlist').value = id;
+
+    // Update activate button label based on current status
+    const alreadyActive = (status === 'active' || status === 'free_trial');
+    const btnAct = document.getElementById('btnActivateNow');
+    if (alreadyActive) {
+      btnAct.textContent = 'Already Active';
+      btnAct.disabled    = true;
+    } else {
+      btnAct.textContent = 'Start 7-Day Free Trial';
+      btnAct.disabled    = false;
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // Supabase helpers
+  // ─────────────────────────────────────────────
+  function normalizeDeviceId(v) {
+    return (v || '').trim().toUpperCase();
+  }
+
+  function getQueryParam(name) {
+    return new URLSearchParams(window.location.search).get(name) || '';
+  }
+
+  async function getOrCreateDevice(deviceId) {
+    const { data, error } = await sb
+      .from('devices')
+      .select('*')
+      .eq('device_id', deviceId)
+      .limit(1);
+
+    if (error) throw new Error(error.message);
+
+    if (data && data.length > 0) return data[0];
+
+    // New device — insert as inactive (activation is a separate step)
+    const { data: inserted, error: insertErr } = await sb
+      .from('devices')
+      .insert([{ device_id: deviceId, status: 'inactive' }])
+      .select();
+
+    if (insertErr) throw new Error(insertErr.message);
+    if (!inserted || inserted.length === 0) throw new Error('Could not create device record.');
+    return inserted[0];
+  }
+
+  // ─────────────────────────────────────────────
+  // Link device
+  // ─────────────────────────────────────────────
+  async function linkDevice() {
+    const id = normalizeDeviceId(document.getElementById('device_id_link').value);
+    if (!id) { setMsg('Please enter a Device ID.', 'error'); return; }
+
+    setBtn('btnLinkDevice', 'Linking…', true);
+    setMsg('Looking up device…');
+
+    try {
+      const row = await getOrCreateDevice(id);
+      currentDeviceId  = row.device_id;
+      currentDeviceRow = row;
+      populateDashboard(row);
+      showScreen('dashboard');
+    } catch (err) {
+      setMsg('Error: ' + err.message, 'error');
+    } finally {
+      setBtn('btnLinkDevice', 'Link Device', false);
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // Activate — grant free trial
+  // ─────────────────────────────────────────────
+  async function activateDevice() {
+    if (!currentDeviceId) { setMsg('No device linked.', 'error'); return; }
+
+    const status = currentDeviceRow?.status || 'inactive';
+    if (status === 'active' || status === 'free_trial') {
+      setMsg('This device is already active.', 'success');
+      return;
     }
 
-    function getQueryParam(name) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(name) || '';
-    }
+    setBtn('btnActivateNow', 'Activating…', true);
+    setMsg('Granting free trial…');
 
-    function normalizeDeviceId(value) {
-      return (value || '').trim().toUpperCase();
-    }
+    // expiry = today + TRIAL_DAYS
+    const expiry = new Date();
+    expiry.setDate(expiry.getDate() + TRIAL_DAYS);
+    const expiryIso = expiry.toISOString().split('T')[0]; // YYYY-MM-DD
 
-    function formatExpiry(value) {
-      if (!value) return '-';
-
-      const d = new Date(value);
-      if (isNaN(d.getTime())) return value;
-
-      return d.toLocaleString();
-    }
-
-    function updateDashboardFromRow(row) {
-      const deviceId = row.device_id || '';
-      const status = row.status || 'inactive';
-      const expiry = row.expiry_date || null;
-
-      dashDeviceId.textContent = deviceId;
-      dashStatus.textContent = status;
-      dashExpiry.textContent = formatExpiry(expiry);
-
-      activateDeviceId.textContent = deviceId;
-      activateStatus.textContent = status;
-      activateExpiry.textContent = formatExpiry(expiry);
-
-      deviceIdPlaylistInput.value = deviceId;
-    }
-
-    async function getOrCreateDevice(deviceId) {
-      const { data: existingRows, error: selectError } = await supabaseClient
+    try {
+      const { data, error } = await sb
         .from('devices')
-        .select('*')
-        .eq('device_id', deviceId)
-        .limit(1);
-
-      if (selectError) {
-        throw new Error(selectError.message);
-      }
-
-      if (existingRows && existingRows.length > 0) {
-        return existingRows[0];
-      }
-
-      const insertPayload = {
-        device_id: deviceId,
-        status: 'inactive'
-      };
-
-      const { data: insertedRows, error: insertError } = await supabaseClient
-        .from('devices')
-        .insert([insertPayload])
+        .update({ status: 'free_trial', expiry_date: expiryIso })
+        .eq('device_id', currentDeviceId)
         .select();
 
-      if (insertError) {
-        throw new Error(insertError.message);
-      }
+      if (error) throw new Error(error.message);
 
-      if (!insertedRows || insertedRows.length === 0) {
-        throw new Error('Device could not be created.');
-      }
+      const updated = data && data.length > 0 ? data[0] : { ...currentDeviceRow, status: 'free_trial', expiry_date: expiryIso };
+      currentDeviceRow = updated;
+      populateDashboard(updated);
+      setMsg(`✓ Free trial activated! Expires ${formatExpiry(expiryIso)}.`, 'success');
 
-      return insertedRows[0];
+      // Reflect on activate screen
+      document.getElementById('activateNote').innerHTML =
+        `✓ Trial active until <strong>${formatExpiry(expiryIso)}</strong>. Return to your TV — it will detect the activation automatically.`;
+
+    } catch (err) {
+      setMsg('Error: ' + err.message, 'error');
+      setBtn('btnActivateNow', 'Start 7-Day Free Trial', false);
     }
+  }
 
-    async function linkCurrentDevice() {
-      const deviceId = normalizeDeviceId(deviceIdLinkInput.value);
+  // ─────────────────────────────────────────────
+  // Add playlist
+  // ─────────────────────────────────────────────
+  async function addPlaylist() {
+    const payload = {
+      device_id:     currentDeviceId,
+      playlist_name: document.getElementById('playlist_name').value.trim(),
+      playlist_url:  document.getElementById('playlist_url').value.trim(),
+      username:      document.getElementById('username').value.trim(),
+      password:      document.getElementById('password').value.trim(),
+      consumed:      false,
+    };
 
-      if (!deviceId) {
-        setMessage('Please enter a Device ID.');
-        return;
-      }
-
-      setMessage('Linking device...');
-
-      try {
-        const row = await getOrCreateDevice(deviceId);
-
-        currentDeviceId = row.device_id;
-        currentDeviceRow = row;
-
-        deviceIdLinkInput.value = currentDeviceId;
-        updateDashboardFromRow(row);
-
-        setMessage('');
-        showScreen('dashboard');
-      } catch (err) {
-        setMessage('Error: ' + err.message);
-      }
-    }
-
-    const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
-    if (codeFromUrl !== '') {
-      deviceIdLinkInput.value = codeFromUrl;
-    }
-
-    btnLinkDevice.addEventListener('click', async function () {
-      await linkCurrentDevice();
-    });
-
-    btnGoActivate.addEventListener('click', function () {
-      if (!currentDeviceId) {
-        setMessage('Please link a device first.');
-        return;
-      }
-
-      setMessage('');
-      showScreen('activate');
-    });
-
-    btnGoPlaylist.addEventListener('click', function () {
-      if (!currentDeviceId) {
-        setMessage('Please link a device first.');
-        return;
-      }
-
-      setMessage('');
-      showScreen('playlist');
-    });
-
-    btnBackToLink.addEventListener('click', function () {
-      setMessage('');
+    if (!payload.device_id) {
+      setMsg('Please link a device first.', 'error');
       showScreen('link');
+      return;
+    }
+    if (!payload.playlist_url || !payload.username || !payload.password) {
+      setMsg('Portal URL, Username, and Password are required.', 'error');
+      return;
+    }
+    if (!payload.playlist_url.startsWith('http://') && !payload.playlist_url.startsWith('https://')) {
+      setMsg('Portal URL must start with http:// or https://', 'error');
+      return;
+    }
+
+    setBtn('btnAddPlaylist', 'Sending…', true);
+    setMsg('Adding playlist…');
+
+    const { error } = await sb.from('device_links').insert([payload]);
+
+    if (error) {
+      setMsg('Error: ' + error.message, 'error');
+      setBtn('btnAddPlaylist', 'Add Playlist', false);
+      return;
+    }
+
+    // Clear form
+    ['playlist_name','playlist_url','username','password'].forEach(id => {
+      document.getElementById(id).value = '';
     });
+    document.getElementById('device_id_playlist').value = currentDeviceId;
 
-    btnBackToDashboardA.addEventListener('click', function () {
-      setMessage('');
-      showScreen('dashboard');
-    });
+    setMsg('✓ Playlist sent! Your TV will load it within seconds.', 'success');
+    setBtn('btnAddPlaylist', 'Add Playlist', false);
+  }
 
-    btnBackToDashboardB.addEventListener('click', function () {
-      setMessage('');
-      showScreen('dashboard');
-    });
+  // ─────────────────────────────────────────────
+  // Event listeners
+  // ─────────────────────────────────────────────
+  document.getElementById('btnLinkDevice').addEventListener('click', linkDevice);
+  document.getElementById('device_id_link').addEventListener('keydown', e => { if (e.key === 'Enter') linkDevice(); });
 
-    btnActivateNow.addEventListener('click', function () {
-      setMessage('Activation backend is not built yet.');
-    });
+  document.getElementById('btnGoActivate').addEventListener('click', () => {
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
+    showScreen('activate');
+  });
 
-    playlistForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
+  document.getElementById('btnGoPlaylist').addEventListener('click', () => {
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
+    showScreen('playlist');
+  });
 
-      const payload = {
-        device_id: currentDeviceId,
-        playlist_name: playlistNameInput.value.trim(),
-        playlist_url: playlistUrlInput.value.trim(),
-        username: usernameInput.value.trim(),
-        password: passwordInput.value.trim()
-      };
+  document.getElementById('btnActivateNow').addEventListener('click', activateDevice);
 
-      if (!payload.device_id) {
-        setMessage('Please link a device first.');
-        showScreen('link');
-        return;
-      }
+  document.getElementById('btnAddPlaylist').addEventListener('click', addPlaylist);
 
-      if (!payload.playlist_url || !payload.username || !payload.password) {
-        setMessage('Portal URL, Username, and Password are required.');
-        return;
-      }
+  document.getElementById('btnBackToLink').addEventListener('click',       () => showScreen('link'));
+  document.getElementById('btnBackToDashboardA').addEventListener('click', () => showScreen('dashboard'));
+  document.getElementById('btnBackToDashboardB').addEventListener('click', () => showScreen('dashboard'));
 
-      if (
-        !payload.playlist_url.startsWith('http://') &&
-        !payload.playlist_url.startsWith('https://')
-      ) {
-        setMessage('Portal URL must start with http:// or https://');
-        return;
-      }
+  // ─────────────────────────────────────────────
+  // Auto-fill device ID from QR code URL param
+  // ─────────────────────────────────────────────
+  const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
+  if (codeFromUrl) {
+    document.getElementById('device_id_link').value = codeFromUrl;
+  }
 
-      setMessage('Sending...');
-
-      const { error } = await supabaseClient
-        .from('device_links')
-        .insert([payload]);
-
-      if (error) {
-        setMessage('Error: ' + error.message);
-        return;
-      }
-
-      playlistForm.reset();
-      deviceIdPlaylistInput.value = currentDeviceId;
-      setMessage('Playlist added successfully. Return to your TV.');
-    });
-
-    showScreen('link');
-  </script>
+  showScreen('link');
+</script>
 </body>
 </html>
