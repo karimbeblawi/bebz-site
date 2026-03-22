@@ -473,6 +473,56 @@
   }
 
   // ─────────────────────────────────────────────
+  // Auto-delete timer for unclaimed playlist rows
+  // ─────────────────────────────────────────────
+  const TRANSMISSION_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
+  let transmissionTimer   = null;
+  let pendingLinkId       = null;
+  let countdownInterval   = null;
+
+  function startTransmissionTimer(linkId) {
+    pendingLinkId = linkId;
+
+    // Countdown display
+    let secondsLeft = TRANSMISSION_TIMEOUT_MS / 1000;
+    updateCountdownMsg(secondsLeft);
+
+    countdownInterval = setInterval(() => {
+      secondsLeft -= 1;
+      if (secondsLeft > 0) {
+        updateCountdownMsg(secondsLeft);
+      }
+    }, 1000);
+
+    transmissionTimer = setTimeout(async () => {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+
+      // Delete the row — TV never picked it up
+      if (pendingLinkId) {
+        await sb.from('device_links').delete().eq('id', pendingLinkId);
+        pendingLinkId = null;
+      }
+
+      setMsg('Transmission failed — TV did not respond. Please make sure your TV is on and the app is open, then try again.', 'error');
+      setBtn('btnAddPlaylist', 'Add Playlist', false);
+    }, TRANSMISSION_TIMEOUT_MS);
+  }
+
+  function cancelTransmissionTimer() {
+    if (transmissionTimer)  { clearTimeout(transmissionTimer);   transmissionTimer  = null; }
+    if (countdownInterval)  { clearInterval(countdownInterval);  countdownInterval  = null; }
+    pendingLinkId = null;
+  }
+
+  function updateCountdownMsg(secondsLeft) {
+    const m = Math.floor(secondsLeft / 60);
+    const s = secondsLeft % 60;
+    const timeStr = m > 0 ? `${m}m ${s}s` : `${s}s`;
+    setMsg(`✓ Playlist sent! Waiting for your TV to pick it up… (${timeStr})`, 'success');
+  }
+
+  // ─────────────────────────────────────────────
   // Add playlist
   // ─────────────────────────────────────────────
   async function addPlaylist() {
@@ -499,10 +549,16 @@
       return;
     }
 
-    setBtn('btnAddPlaylist', 'Sending…', true);
-    setMsg('Adding playlist…');
+    // Cancel any previous pending transmission
+    cancelTransmissionTimer();
 
-    const { error } = await sb.from('device_links').insert([payload]);
+    setBtn('btnAddPlaylist', 'Sending…', true);
+    setMsg('Sending to your TV…');
+
+    const { data, error } = await sb
+      .from('device_links')
+      .insert([payload])
+      .select('id');
 
     if (error) {
       setMsg('Error: ' + error.message, 'error');
@@ -510,14 +566,21 @@
       return;
     }
 
-    // Clear form
+    // Clear the form immediately so credentials aren't visible
     ['playlist_name','playlist_url','username','password'].forEach(id => {
       document.getElementById(id).value = '';
     });
     document.getElementById('device_id_playlist').value = currentDeviceId;
 
-    setMsg('✓ Playlist sent! Your TV will load it within seconds.', 'success');
-    setBtn('btnAddPlaylist', 'Add Playlist', false);
+    const insertedId = data && data.length > 0 ? data[0].id : null;
+
+    if (insertedId) {
+      // Start 2-minute watchdog — deletes row if TV never picks it up
+      startTransmissionTimer(insertedId);
+    } else {
+      setMsg('✓ Playlist sent! Your TV will load it within seconds.', 'success');
+      setBtn('btnAddPlaylist', 'Add Playlist', false);
+    }
   }
 
   // ─────────────────────────────────────────────
@@ -542,7 +605,10 @@
 
   document.getElementById('btnBackToLink').addEventListener('click',       () => showScreen('link'));
   document.getElementById('btnBackToDashboardA').addEventListener('click', () => showScreen('dashboard'));
-  document.getElementById('btnBackToDashboardB').addEventListener('click', () => showScreen('dashboard'));
+  document.getElementById('btnBackToDashboardB').addEventListener('click', () => {
+    cancelTransmissionTimer();
+    showScreen('dashboard');
+  });
 
   // ─────────────────────────────────────────────
   // Auto-fill device ID from QR code URL param
