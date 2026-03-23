@@ -476,9 +476,11 @@
   // Auto-delete timer for unclaimed playlist rows
   // ─────────────────────────────────────────────
   const TRANSMISSION_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
+  const PICKUP_POLL_MS = 3000; // check every 3 seconds
   let transmissionTimer   = null;
   let pendingLinkId       = null;
   let countdownInterval   = null;
+  let pickupPollInterval  = null;
 
   function startTransmissionTimer(linkId) {
     pendingLinkId = linkId;
@@ -487,6 +489,7 @@
     let secondsLeft = TRANSMISSION_TIMEOUT_MS / 1000;
     updateCountdownMsg(secondsLeft);
 
+    // Every second: tick the countdown
     countdownInterval = setInterval(() => {
       secondsLeft -= 1;
       if (secondsLeft > 0) {
@@ -494,9 +497,28 @@
       }
     }, 1000);
 
+    // Every 3 seconds: check if Roku already deleted the row
+    pickupPollInterval = setInterval(async () => {
+      if (!pendingLinkId) return;
+      const { data } = await sb
+        .from('device_links')
+        .select('id')
+        .eq('id', Number(pendingLinkId))
+        .limit(1);
+      if (!data || data.length === 0) {
+        // Row is gone — Roku picked it up successfully
+        cancelTransmissionTimer();
+        setMsg('✓ Playlist received by your TV!', 'success');
+        setBtn('btnAddPlaylist', 'Add Playlist', false);
+      }
+    }, PICKUP_POLL_MS);
+
+    // 2-minute hard deadline — row was never picked up
     transmissionTimer = setTimeout(async () => {
       clearInterval(countdownInterval);
       countdownInterval = null;
+      clearInterval(pickupPollInterval);
+      pickupPollInterval = null;
 
       // Delete the row — TV never picked it up
       if (pendingLinkId) {
@@ -516,8 +538,9 @@
   }
 
   function cancelTransmissionTimer() {
-    if (transmissionTimer)  { clearTimeout(transmissionTimer);   transmissionTimer  = null; }
-    if (countdownInterval)  { clearInterval(countdownInterval);  countdownInterval  = null; }
+    if (transmissionTimer)   { clearTimeout(transmissionTimer);    transmissionTimer   = null; }
+    if (countdownInterval)   { clearInterval(countdownInterval);   countdownInterval   = null; }
+    if (pickupPollInterval)  { clearInterval(pickupPollInterval);  pickupPollInterval  = null; }
     pendingLinkId = null;
   }
 
