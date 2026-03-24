@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -174,12 +173,9 @@
     <button id="btnLinkDevice">Link Device</button>
 
     <div class="small-note">Type the Device ID manually, or scan the QR code shown on your TV.</div>
- 
-
- </section>
+  </section>
 
   <!-- ── SCREEN: Dashboard ── -->
-
   <section id="screen-dashboard" class="hidden">
     <h2>Device Dashboard</h2>
 
@@ -203,15 +199,11 @@
     <button id="btnGoPlaylist" class="secondary">Add Playlist</button>
     <hr class="divider" />
     <button id="btnBackToLink" class="secondary">← Back</button>
-
-
   </section>
 
   <!-- ── SCREEN: Activate ── -->
- 
- <section id="screen-activate" class="hidden">
+  <section id="screen-activate" class="hidden">
     <h2>Activate Device</h2>
-
 
     <div class="info-box">
       <div class="info-row">
@@ -235,15 +227,11 @@
       Starting a trial sets your status to <strong>free_trial</strong> for 7 days.
       Payment integration coming in Phase 2.
     </div>
-
-
   </section>
 
   <!-- ── SCREEN: Playlist ── -->
-
   <section id="screen-playlist" class="hidden">
     <h2>Add Playlist</h2>
-
 
     <label class="field-label">Device ID</label>
     <input id="device_id_playlist" readonly />
@@ -264,8 +252,6 @@
     <button id="btnBackToDashboardB" class="secondary">← Back</button>
 
     <div class="small-note">Adding a playlist does not remove existing playlists on the TV.</div>
-
-
   </section>
 
   <div id="msg"></div>
@@ -583,26 +569,16 @@
       showScreen('link');
       return;
     }
-
     const isM3u = payload.playlist_url.toLowerCase().endsWith('.m3u') || payload.playlist_url.toLowerCase().endsWith('.m3u8');
-
     if (!payload.playlist_url || (!isM3u && (!payload.username || !payload.password))) {
       setMsg('Portal URL, Username, and Password are required.', 'error');
       return;
     }
-
-    if (isM3u) {
-      payload.username = ''; 
-      payload.password = '';
-    }
-
+    if (isM3u) { payload.username = ''; payload.password = ''; }
     if (!payload.playlist_url.startsWith('http://') && !payload.playlist_url.startsWith('https://')) {
       setMsg('Portal URL must start with http:// or https://', 'error');
       return;
     }
-
-
-
 
     // Cancel any previous pending transmission
     cancelTransmissionTimer();
@@ -669,11 +645,11 @@
   // Auto-fill device ID from QR code URL param
   // ─────────────────────────────────────────────
   const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
+  showScreen('link');
   if (codeFromUrl) {
     document.getElementById('device_id_link').value = codeFromUrl;
+    linkDevice();
   }
-
-  showScreen('link');
 </script>
 </body>
 </html>
