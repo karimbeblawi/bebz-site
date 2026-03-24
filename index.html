@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -157,107 +158,125 @@
       margin: 16px 0;
     }
   </style>
+
 </head>
 
 <body>
 <div class="card">
 
   <!-- ── SCREEN: Link ── -->
+
   <section id="screen-link">
     <h1>Bebz TV</h1>
     <p class="sub">Link your device first, then activate it or add a playlist.</p>
 
-    <label class="field-label" for="device_id_link">Device ID</label>
-    <input id="device_id_link" placeholder="Enter Device ID (e.g. AB3X9K…)" autocomplete="off" />
 
-    <button id="btnLinkDevice">Link Device</button>
+<label class="field-label" for="device_id_link">Device ID</label>
+<input id="device_id_link" placeholder="Enter Device ID (e.g. AB3X9K…)" autocomplete="off" />
 
-    <div class="small-note">Type the Device ID manually, or scan the QR code shown on your TV.</div>
+<button id="btnLinkDevice">Link Device</button>
+
+<div class="small-note">Type the Device ID manually, or scan the QR code shown on your TV.</div>
+
+
   </section>
 
   <!-- ── SCREEN: Dashboard ── -->
+
   <section id="screen-dashboard" class="hidden">
     <h2>Device Dashboard</h2>
 
-    <div class="info-box">
-      <div class="info-row">
-        <span class="info-label">Device ID</span>
-        <span id="dashDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Status</span>
-        <span id="dashStatus" class="status-pill inactive">inactive</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Expiry</span>
-        <span id="dashExpiry">—</span>
-        <span id="dashExpiryNote" class="expiry-note hidden"></span>
-      </div>
-    </div>
 
-    <button id="btnGoActivate">Activate / Start Trial</button>
-    <button id="btnGoPlaylist" class="secondary">Add Playlist</button>
-    <hr class="divider" />
-    <button id="btnBackToLink" class="secondary">← Back</button>
+<div class="info-box">
+  <div class="info-row">
+    <span class="info-label">Device ID</span>
+    <span id="dashDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">Status</span>
+    <span id="dashStatus" class="status-pill inactive">inactive</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">Expiry</span>
+    <span id="dashExpiry">—</span>
+    <span id="dashExpiryNote" class="expiry-note hidden"></span>
+  </div>
+</div>
+
+<button id="btnGoActivate">Activate / Start Trial</button>
+<button id="btnGoPlaylist" class="secondary">Add Playlist</button>
+<hr class="divider" />
+<button id="btnBackToLink" class="secondary">← Back</button>
+
+
   </section>
 
   <!-- ── SCREEN: Activate ── -->
+
   <section id="screen-activate" class="hidden">
     <h2>Activate Device</h2>
 
-    <div class="info-box">
-      <div class="info-row">
-        <span class="info-label">Device ID</span>
-        <span id="activateDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Status</span>
-        <span id="activateStatus" class="status-pill inactive">inactive</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Expiry</span>
-        <span id="activateExpiry">—</span>
-      </div>
-    </div>
 
-    <button id="btnActivateNow">Start 7-Day Free Trial</button>
-    <button id="btnBackToDashboardA" class="secondary">← Back</button>
+<div class="info-box">
+  <div class="info-row">
+    <span class="info-label">Device ID</span>
+    <span id="activateDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">Status</span>
+    <span id="activateStatus" class="status-pill inactive">inactive</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">Expiry</span>
+    <span id="activateExpiry">—</span>
+  </div>
+</div>
 
-    <div class="small-note" id="activateNote">
-      Starting a trial sets your status to <strong>free_trial</strong> for 7 days.
-      Payment integration coming in Phase 2.
-    </div>
+<button id="btnActivateNow">Start 7-Day Free Trial</button>
+<button id="btnBackToDashboardA" class="secondary">← Back</button>
+
+<div class="small-note" id="activateNote">
+  Starting a trial sets your status to <strong>free_trial</strong> for 7 days.
+  Payment integration coming in Phase 2.
+</div>
+
+
   </section>
 
   <!-- ── SCREEN: Playlist ── -->
+
   <section id="screen-playlist" class="hidden">
     <h2>Add Playlist</h2>
 
-    <label class="field-label">Device ID</label>
-    <input id="device_id_playlist" readonly />
 
-    <label class="field-label" for="playlist_name">Playlist Name</label>
-    <input id="playlist_name" placeholder="My Playlist (optional)" />
+<label class="field-label">Device ID</label>
+<input id="device_id_playlist" readonly />
 
-    <label class="field-label" for="playlist_url">Portal URL</label>
-    <input id="playlist_url" placeholder="http://example.com:8080" />
+<label class="field-label" for="playlist_name">Playlist Name</label>
+<input id="playlist_name" placeholder="My Playlist (optional)" />
 
-    <label class="field-label" for="username">Username</label>
-    <input id="username" placeholder="Username" />
+<label class="field-label" for="playlist_url">Portal URL</label>
+<input id="playlist_url" placeholder="http://example.com:8080" />
 
-    <label class="field-label" for="password">Password</label>
-    <input id="password" placeholder="Password" type="password" />
+<label class="field-label" for="username">Username</label>
+<input id="username" placeholder="Username" />
 
-    <button id="btnAddPlaylist">Add Playlist</button>
-    <button id="btnBackToDashboardB" class="secondary">← Back</button>
+<label class="field-label" for="password">Password</label>
+<input id="password" placeholder="Password" type="password" />
 
-    <div class="small-note">Adding a playlist does not remove existing playlists on the TV.</div>
+<button id="btnAddPlaylist">Add Playlist</button>
+<button id="btnBackToDashboardB" class="secondary">← Back</button>
+
+<div class="small-note">Adding a playlist does not remove existing playlists on the TV.</div>
+
+
   </section>
 
   <div id="msg"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
   // ─────────────────────────────────────────────
   // Config
@@ -320,8 +339,8 @@
     const diffDays = Math.ceil(diffMs / 86400000);
     if (diffDays < 0)  return { text: 'expired',            cls: 'over' };
     if (diffDays === 0) return { text: 'expires today',     cls: 'warn' };
-    if (diffDays <= 3)  return { text: `${diffDays}d left`, cls: 'warn' };
-    return                     { text: `${diffDays}d left`, cls: '' };
+    if (diffDays <= 3)  return { text: ${diffDays}d left, cls: 'warn' };
+    return                     { text: ${diffDays}d left, cls: '' };
   }
 
   function applyStatusPill(el, status) {
@@ -460,11 +479,11 @@
       const updated = data && data.length > 0 ? data[0] : { ...currentDeviceRow, status: 'free_trial', expiry_date: expiryIso };
       currentDeviceRow = updated;
       populateDashboard(updated);
-      setMsg(`✓ Free trial activated! Expires ${formatExpiry(expiryIso)}.`, 'success');
+      setMsg(✓ Free trial activated! Expires ${formatExpiry(expiryIso)}., 'success');
 
       // Reflect on activate screen
       document.getElementById('activateNote').innerHTML =
-        `✓ Trial active until <strong>${formatExpiry(expiryIso)}</strong>. Return to your TV — it will detect the activation automatically.`;
+        ✓ Trial active until <strong>${formatExpiry(expiryIso)}</strong>. Return to your TV — it will detect the activation automatically.;
 
     } catch (err) {
       setMsg('Error: ' + err.message, 'error');
@@ -547,8 +566,8 @@
   function updateCountdownMsg(secondsLeft) {
     const m = Math.floor(secondsLeft / 60);
     const s = secondsLeft % 60;
-    const timeStr = m > 0 ? `${m}m ${s}s` : `${s}s`;
-    setMsg(`✓ Playlist sent! Waiting for your TV to pick it up… (${timeStr})`, 'success');
+    const timeStr = m > 0 ? ${m}m ${s}s : ${s}s;
+    setMsg(✓ Playlist sent! Waiting for your TV to pick it up… (${timeStr}), 'success');
   }
 
   // ─────────────────────────────────────────────
@@ -569,10 +588,12 @@
       showScreen('link');
       return;
     }
-    if (!payload.playlist_url || !payload.username || !payload.password) {
+    const isM3u = payload.playlist_url.toLowerCase().endsWith('.m3u') || payload.playlist_url.toLowerCase().endsWith('.m3u8');
+    if (!payload.playlist_url || (!isM3u && (!payload.username || !payload.password))) {
       setMsg('Portal URL, Username, and Password are required.', 'error');
       return;
     }
+    if (isM3u) { payload.username = ''; payload.password = ''; }
     if (!payload.playlist_url.startsWith('http://') && !payload.playlist_url.startsWith('https://')) {
       setMsg('Portal URL must start with http:// or https://', 'error');
       return;
@@ -643,11 +664,12 @@
   // Auto-fill device ID from QR code URL param
   // ─────────────────────────────────────────────
   const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
+  showScreen('link');
   if (codeFromUrl) {
     document.getElementById('device_id_link').value = codeFromUrl;
+    linkDevice();
   }
-
-  showScreen('link');
 </script>
+
 </body>
 </html>
