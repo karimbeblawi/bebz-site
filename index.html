@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -86,6 +85,7 @@
       flex-shrink: 0;
     }
 
+    /* Status pill with dynamic colours */
     .status-pill {
       display: inline-block;
       padding: 4px 10px;
@@ -101,6 +101,7 @@
     .status-pill.expired    { background: #450a0a; color: #f87171; }
     .status-pill.inactive   { background: #2b3448; color: #9ca3af; }
 
+    /* Expiry countdown badge */
     .expiry-note {
       font-size: 12px;
       color: #60a5fa;
@@ -155,139 +156,108 @@
       border-top: 1px solid #1e293b;
       margin: 16px 0;
     }
-
-    /* M3U hint badge shown when URL is detected as M3U */
-    .m3u-hint {
-      font-size: 12px;
-      color: #60a5fa;
-      margin-top: -10px;
-      margin-bottom: 12px;
-      display: none;
-    }
-    .m3u-hint.visible { display: block; }
   </style>
-
 </head>
 
 <body>
 <div class="card">
 
-  <!-- SCREEN: Link -->
-
+  <!-- ── SCREEN: Link ── -->
   <section id="screen-link">
     <h1>Bebz TV</h1>
     <p class="sub">Link your device first, then activate it or add a playlist.</p>
 
+    <label class="field-label" for="device_id_link">Device ID</label>
+    <input id="device_id_link" placeholder="Enter Device ID (e.g. AB3X9K…)" autocomplete="off" />
 
-<label class="field-label" for="device_id_link">Device ID</label>
-<input id="device_id_link" placeholder="Enter Device ID (e.g. AB3X9K…)" autocomplete="off" />
+    <button id="btnLinkDevice">Link Device</button>
 
-<button id="btnLinkDevice">Link Device</button>
-
-<div class="small-note">Type the Device ID manually, or scan the QR code shown on your TV.</div>
-
-
+    <div class="small-note">Type the Device ID manually, or scan the QR code shown on your TV.</div>
   </section>
 
-  <!-- SCREEN: Dashboard -->
-
+  <!-- ── SCREEN: Dashboard ── -->
   <section id="screen-dashboard" class="hidden">
     <h2>Device Dashboard</h2>
 
+    <div class="info-box">
+      <div class="info-row">
+        <span class="info-label">Device ID</span>
+        <span id="dashDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Status</span>
+        <span id="dashStatus" class="status-pill inactive">inactive</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Expiry</span>
+        <span id="dashExpiry">—</span>
+        <span id="dashExpiryNote" class="expiry-note hidden"></span>
+      </div>
+    </div>
 
-<div class="info-box">
-  <div class="info-row">
-    <span class="info-label">Device ID</span>
-    <span id="dashDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
-  </div>
-  <div class="info-row">
-    <span class="info-label">Status</span>
-    <span id="dashStatus" class="status-pill inactive">inactive</span>
-  </div>
-  <div class="info-row">
-    <span class="info-label">Expiry</span>
-    <span id="dashExpiry">—</span>
-    <span id="dashExpiryNote" class="expiry-note hidden"></span>
-  </div>
-</div>
-
-<button id="btnGoActivate">Activate / Start Trial</button>
-<button id="btnGoPlaylist" class="secondary">Add Playlist</button>
-<hr class="divider" />
-<button id="btnBackToLink" class="secondary">← Back</button>
-
-
+    <button id="btnGoActivate">Activate / Start Trial</button>
+    <button id="btnGoPlaylist" class="secondary">Add Playlist</button>
+    <hr class="divider" />
+    <button id="btnBackToLink" class="secondary">← Back</button>
   </section>
 
-  <!-- SCREEN: Activate -->
-
+  <!-- ── SCREEN: Activate ── -->
   <section id="screen-activate" class="hidden">
     <h2>Activate Device</h2>
 
+    <div class="info-box">
+      <div class="info-row">
+        <span class="info-label">Device ID</span>
+        <span id="activateDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Status</span>
+        <span id="activateStatus" class="status-pill inactive">inactive</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Expiry</span>
+        <span id="activateExpiry">—</span>
+      </div>
+    </div>
 
-<div class="info-box">
-  <div class="info-row">
-    <span class="info-label">Device ID</span>
-    <span id="activateDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
-  </div>
-  <div class="info-row">
-    <span class="info-label">Status</span>
-    <span id="activateStatus" class="status-pill inactive">inactive</span>
-  </div>
-  <div class="info-row">
-    <span class="info-label">Expiry</span>
-    <span id="activateExpiry">—</span>
-  </div>
-</div>
+    <button id="btnActivateNow">Start 7-Day Free Trial</button>
+    <button id="btnBackToDashboardA" class="secondary">← Back</button>
 
-<button id="btnActivateNow">Start 7-Day Free Trial</button>
-<button id="btnBackToDashboardA" class="secondary">← Back</button>
-
-<div class="small-note" id="activateNote">
-  Starting a trial sets your status to <strong>free_trial</strong> for 7 days.
-  Payment integration coming in Phase 2.
-</div>
-
-
+    <div class="small-note" id="activateNote">
+      Starting a trial sets your status to <strong>free_trial</strong> for 7 days.
+      Payment integration coming in Phase 2.
+    </div>
   </section>
 
-  <!-- SCREEN: Playlist -->
-
+  <!-- ── SCREEN: Playlist ── -->
   <section id="screen-playlist" class="hidden">
     <h2>Add Playlist</h2>
 
+    <label class="field-label">Device ID</label>
+    <input id="device_id_playlist" readonly />
 
-<label class="field-label">Device ID</label>
-<input id="device_id_playlist" readonly />
+    <label class="field-label" for="playlist_name">Playlist Name</label>
+    <input id="playlist_name" placeholder="My Playlist (optional)" />
 
-<label class="field-label" for="playlist_name">Playlist Name</label>
-<input id="playlist_name" placeholder="My Playlist (optional)" />
+    <label class="field-label" for="playlist_url">Portal URL</label>
+    <input id="playlist_url" placeholder="http://example.com:8080" />
 
-<label class="field-label" for="playlist_url">Portal URL or M3U Link</label>
-<input id="playlist_url" placeholder="http://example.com:8080  or  https://…/playlist.m3u" />
-<div id="m3uHint" class="m3u-hint">M3U detected — username and password are not required.</div>
+    <label class="field-label" for="username">Username</label>
+    <input id="username" placeholder="Username" />
 
-<div id="xtreamFields">
-  <label class="field-label" for="username">Username</label>
-  <input id="username" placeholder="Username" />
+    <label class="field-label" for="password">Password</label>
+    <input id="password" placeholder="Password" type="password" />
 
-  <label class="field-label" for="password">Password</label>
-  <input id="password" placeholder="Password" type="password" />
-</div>
+    <button id="btnAddPlaylist">Add Playlist</button>
+    <button id="btnBackToDashboardB" class="secondary">← Back</button>
 
-<button id="btnAddPlaylist">Add Playlist</button>
-<button id="btnBackToDashboardB" class="secondary">← Back</button>
-
-<div class="small-note">Adding a playlist does not remove existing playlists on the TV.</div>
-
-
+    <div class="small-note">Adding a playlist does not remove existing playlists on the TV.</div>
   </section>
 
   <div id="msg"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
   // ─────────────────────────────────────────────
   // Config
@@ -305,24 +275,6 @@
   let currentDeviceRow = null;
 
   // ─────────────────────────────────────────────
-  // M3U detection
-  // ─────────────────────────────────────────────
-  function isM3uUrl(url) {
-    const lower = (url || '').toLowerCase();
-    return lower.endsWith('.m3u') ||
-           lower.endsWith('.m3u8') ||
-           (lower.includes('get.php?') && lower.includes('type=m3u'));
-  }
-
-  // Update playlist form dynamically as user types the URL
-  document.getElementById('playlist_url').addEventListener('input', function() {
-    const url = this.value.trim();
-    const m3u = isM3uUrl(url);
-    document.getElementById('m3uHint').classList.toggle('visible', m3u);
-    document.getElementById('xtreamFields').classList.toggle('hidden', m3u);
-  });
-
-  // ─────────────────────────────────────────────
   // UI helpers
   // ─────────────────────────────────────────────
   const screens = {
@@ -336,15 +288,6 @@
     Object.values(screens).forEach(s => s.classList.add('hidden'));
     screens[name].classList.remove('hidden');
     setMsg('');
-    // Reset M3U hint when navigating to playlist screen
-    if (name === 'playlist') {
-      document.getElementById('m3uHint').classList.remove('visible');
-      document.getElementById('xtreamFields').classList.remove('hidden');
-      document.getElementById('playlist_url').value = '';
-      document.getElementById('username').value = '';
-      document.getElementById('password').value = '';
-      document.getElementById('playlist_name').value = '';
-    }
   }
 
   function setMsg(text, type = '') {
@@ -375,10 +318,10 @@
     if (isNaN(exp.getTime())) return null;
     const diffMs   = exp - Date.now();
     const diffDays = Math.ceil(diffMs / 86400000);
-    if (diffDays < 0)   return { text: 'expired',            cls: 'over' };
-    if (diffDays === 0) return { text: 'expires today',      cls: 'warn' };
-    if (diffDays <= 3)  return { text: ${diffDays}d left,  cls: 'warn' };
-    return                     { text: ${diffDays}d left,  cls: '' };
+    if (diffDays < 0)  return { text: 'expired',            cls: 'over' };
+    if (diffDays === 0) return { text: 'expires today',     cls: 'warn' };
+    if (diffDays <= 3)  return { text: `${diffDays}d left`, cls: 'warn' };
+    return                     { text: `${diffDays}d left`, cls: '' };
   }
 
   function applyStatusPill(el, status) {
@@ -394,6 +337,7 @@
     const status = row.status      || 'inactive';
     const expiry = row.expiry_date || null;
 
+    // Dashboard screen
     document.getElementById('dashDeviceId').textContent = id;
     applyStatusPill(document.getElementById('dashStatus'), status);
     document.getElementById('dashExpiry').textContent = formatExpiry(expiry);
@@ -408,12 +352,15 @@
       noteEl.classList.add('hidden');
     }
 
+    // Activate screen mirrors
     document.getElementById('activateDeviceId').textContent = id;
     applyStatusPill(document.getElementById('activateStatus'), status);
     document.getElementById('activateExpiry').textContent = formatExpiry(expiry);
 
+    // Playlist screen device id
     document.getElementById('device_id_playlist').value = id;
 
+    // Update activate button label based on current status
     const alreadyActive = (status === 'active' || status === 'free_trial');
     const btnAct = document.getElementById('btnActivateNow');
     if (alreadyActive) {
@@ -437,24 +384,25 @@
   }
 
   async function getOrCreateDevice(deviceId) {
-    const _res1 = await sb
+    const { data, error } = await sb
       .from('devices')
       .select('*')
       .eq('device_id', deviceId)
       .limit(1);
 
-    if (_res1.error) throw new Error(_res1.error.message);
+    if (error) throw new Error(error.message);
 
-    if (_res1.data && _res1.data.length > 0) return _res1.data[0];
+    if (data && data.length > 0) return data[0];
 
-    const _res2 = await sb
+    // New device — insert as inactive (activation is a separate step)
+    const { data: inserted, error: insertErr } = await sb
       .from('devices')
       .insert([{ device_id: deviceId, status: 'inactive' }])
       .select();
 
-    if (_res2.error) throw new Error(_res2.error.message);
-    if (!_res2.data || _res2.data.length === 0) throw new Error('Could not create device record.');
-    return _res2.data[0];
+    if (insertErr) throw new Error(insertErr.message);
+    if (!inserted || inserted.length === 0) throw new Error('Could not create device record.');
+    return inserted[0];
   }
 
   // ─────────────────────────────────────────────
@@ -486,7 +434,7 @@
   async function activateDevice() {
     if (!currentDeviceId) { setMsg('No device linked.', 'error'); return; }
 
-    const status = (currentDeviceRow && currentDeviceRow.status) ? currentDeviceRow.status : 'inactive';
+    const status = currentDeviceRow?.status || 'inactive';
     if (status === 'active' || status === 'free_trial') {
       setMsg('This device is already active.', 'success');
       return;
@@ -495,26 +443,28 @@
     setBtn('btnActivateNow', 'Activating…', true);
     setMsg('Granting free trial…');
 
+    // expiry = today + TRIAL_DAYS
     const expiry = new Date();
     expiry.setDate(expiry.getDate() + TRIAL_DAYS);
-    const expiryIso = expiry.toISOString().split('T')[0];
+    const expiryIso = expiry.toISOString().split('T')[0]; // YYYY-MM-DD
 
     try {
-      const _res3 = await sb
+      const { data, error } = await sb
         .from('devices')
         .update({ status: 'free_trial', expiry_date: expiryIso })
         .eq('device_id', currentDeviceId)
         .select();
 
-      if (_res3.error) throw new Error(_res3.error.message);
+      if (error) throw new Error(error.message);
 
-      const updated = (_res3.data && _res3.data.length > 0) ? _res3.data[0] : Object.assign({}, currentDeviceRow, { status: 'free_trial', expiry_date: expiryIso });
+      const updated = data && data.length > 0 ? data[0] : { ...currentDeviceRow, status: 'free_trial', expiry_date: expiryIso };
       currentDeviceRow = updated;
       populateDashboard(updated);
-      setMsg(✓ Free trial activated! Expires ${formatExpiry(expiryIso)}., 'success');
+      setMsg(`✓ Free trial activated! Expires ${formatExpiry(expiryIso)}.`, 'success');
 
+      // Reflect on activate screen
       document.getElementById('activateNote').innerHTML =
-        ✓ Trial active until <strong>${formatExpiry(expiryIso)}</strong>. Return to your TV — it will detect the activation automatically.;
+        `✓ Trial active until <strong>${formatExpiry(expiryIso)}</strong>. Return to your TV — it will detect the activation automatically.`;
 
     } catch (err) {
       setMsg('Error: ' + err.message, 'error');
@@ -525,8 +475,8 @@
   // ─────────────────────────────────────────────
   // Auto-delete timer for unclaimed playlist rows
   // ─────────────────────────────────────────────
-  const TRANSMISSION_TIMEOUT_MS = 2 * 60 * 1000;
-  const PICKUP_POLL_MS = 3000;
+  const TRANSMISSION_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
+  const PICKUP_POLL_MS = 3000; // check every 3 seconds
   let transmissionTimer   = null;
   let pendingLinkId       = null;
   let countdownInterval   = null;
@@ -535,40 +485,50 @@
   function startTransmissionTimer(linkId) {
     pendingLinkId = linkId;
 
+    // Countdown display
     let secondsLeft = TRANSMISSION_TIMEOUT_MS / 1000;
     updateCountdownMsg(secondsLeft);
 
+    // Every second: tick the countdown
     countdownInterval = setInterval(() => {
       secondsLeft -= 1;
-      if (secondsLeft > 0) updateCountdownMsg(secondsLeft);
+      if (secondsLeft > 0) {
+        updateCountdownMsg(secondsLeft);
+      }
     }, 1000);
 
+    // Every 3 seconds: check if Roku already deleted the row
     pickupPollInterval = setInterval(async () => {
       if (!pendingLinkId) return;
-      const _res4 = await sb
+      const { data } = await sb
         .from('device_links')
         .select('id')
         .eq('id', Number(pendingLinkId))
         .limit(1);
-      if (!_res4.data || _res4.data.length === 0) {
+      if (!data || data.length === 0) {
+        // Row is gone — Roku picked it up successfully
         cancelTransmissionTimer();
         setMsg('✓ Playlist received by your TV!', 'success');
         setBtn('btnAddPlaylist', 'Add Playlist', false);
       }
     }, PICKUP_POLL_MS);
 
+    // 2-minute hard deadline — row was never picked up
     transmissionTimer = setTimeout(async () => {
       clearInterval(countdownInterval);
       countdownInterval = null;
       clearInterval(pickupPollInterval);
       pickupPollInterval = null;
 
+      // Delete the row — TV never picked it up
       if (pendingLinkId) {
-        const _res5 = await sb
+        const { error: delErr } = await sb
           .from('device_links')
           .delete()
           .eq('id', Number(pendingLinkId));
-        if (_res5.error) console.error('Auto-delete failed:', _res5.error.message);
+        if (delErr) {
+          console.error('Auto-delete failed:', delErr.message);
+        }
         pendingLinkId = null;
       }
 
@@ -578,82 +538,73 @@
   }
 
   function cancelTransmissionTimer() {
-    if (transmissionTimer)  { clearTimeout(transmissionTimer);   transmissionTimer  = null; }
-    if (countdownInterval)  { clearInterval(countdownInterval);  countdownInterval  = null; }
-    if (pickupPollInterval) { clearInterval(pickupPollInterval); pickupPollInterval = null; }
+    if (transmissionTimer)   { clearTimeout(transmissionTimer);    transmissionTimer   = null; }
+    if (countdownInterval)   { clearInterval(countdownInterval);   countdownInterval   = null; }
+    if (pickupPollInterval)  { clearInterval(pickupPollInterval);  pickupPollInterval  = null; }
     pendingLinkId = null;
   }
 
   function updateCountdownMsg(secondsLeft) {
     const m = Math.floor(secondsLeft / 60);
     const s = secondsLeft % 60;
-    const timeStr = m > 0 ? ${m}m ${s}s : ${s}s;
-    setMsg(✓ Playlist sent! Waiting for your TV to pick it up… (${timeStr}), 'success');
+    const timeStr = m > 0 ? `${m}m ${s}s` : `${s}s`;
+    setMsg(`✓ Playlist sent! Waiting for your TV to pick it up… (${timeStr})`, 'success');
   }
 
   // ─────────────────────────────────────────────
   // Add playlist
   // ─────────────────────────────────────────────
   async function addPlaylist() {
-    const url      = document.getElementById('playlist_url').value.trim();
-    const name     = document.getElementById('playlist_name').value.trim();
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const m3u      = isM3uUrl(url);
+    const payload = {
+      device_id:     currentDeviceId,
+      playlist_name: document.getElementById('playlist_name').value.trim(),
+      playlist_url:  document.getElementById('playlist_url').value.trim(),
+      username:      document.getElementById('username').value.trim(),
+      password:      document.getElementById('password').value.trim(),
+      consumed:      false,
+    };
 
-    if (!currentDeviceId) {
+    if (!payload.device_id) {
       setMsg('Please link a device first.', 'error');
       showScreen('link');
       return;
     }
-    if (!url) {
-      setMsg('Portal URL is required.', 'error');
-      return;
-    }
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      setMsg('Portal URL must start with http:// or https://', 'error');
-      return;
-    }
-    // Only require username/password for Xtream playlists
-    if (!m3u && (!username || !password)) {
+    if (!payload.playlist_url || !payload.username || !payload.password) {
       setMsg('Portal URL, Username, and Password are required.', 'error');
       return;
     }
+    if (!payload.playlist_url.startsWith('http://') && !payload.playlist_url.startsWith('https://')) {
+      setMsg('Portal URL must start with http:// or https://', 'error');
+      return;
+    }
 
-    const payload = {
-      device_id:     currentDeviceId,
-      playlist_name: name || (m3u ? 'M3U Playlist' : 'My Playlist'),
-      playlist_url:  url,
-      username:      m3u ? '' : username,
-      password:      m3u ? '' : password,
-      consumed:      false,
-    };
-
+    // Cancel any previous pending transmission
     cancelTransmissionTimer();
+
     setBtn('btnAddPlaylist', 'Sending…', true);
     setMsg('Sending to your TV…');
 
-    const _res6 = await sb
+    const { data, error } = await sb
       .from('device_links')
       .insert([payload])
       .select('id');
 
-    if (_res6.error) {
-      setMsg('Error: ' + _res6.error.message, 'error');
+    if (error) {
+      setMsg('Error: ' + error.message, 'error');
       setBtn('btnAddPlaylist', 'Add Playlist', false);
       return;
     }
 
-    // Clear form
-    ['playlist_name','playlist_url','username','password'].forEach(function(id) {
+    // Clear the form immediately so credentials aren't visible
+    ['playlist_name','playlist_url','username','password'].forEach(id => {
       document.getElementById(id).value = '';
     });
     document.getElementById('device_id_playlist').value = currentDeviceId;
-    document.getElementById('m3uHint').classList.remove('visible');
-    document.getElementById('xtreamFields').classList.remove('hidden');
 
-    const insertedId = (_res6.data && _res6.data.length > 0) ? _res6.data[0].id : null;
+    const insertedId = data && data.length > 0 ? data[0].id : null;
+
     if (insertedId) {
+      // Start 2-minute watchdog — deletes row if TV never picks it up
       startTransmissionTimer(insertedId);
     } else {
       setMsg('✓ Playlist sent! Your TV will load it within seconds.', 'success');
@@ -678,6 +629,7 @@
   });
 
   document.getElementById('btnActivateNow').addEventListener('click', activateDevice);
+
   document.getElementById('btnAddPlaylist').addEventListener('click', addPlaylist);
 
   document.getElementById('btnBackToLink').addEventListener('click',       () => showScreen('link'));
@@ -692,14 +644,10 @@
   // ─────────────────────────────────────────────
   const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
   if (codeFromUrl) {
-    showScreen('link');
     document.getElementById('device_id_link').value = codeFromUrl;
-    // Auto-link immediately when arriving via QR code scan
-    linkDevice();
-  } else {
-    showScreen('link');
   }
-</script>
 
+  showScreen('link');
+</script>
 </body>
 </html>
