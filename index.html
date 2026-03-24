@@ -692,10 +692,13 @@
   // ─────────────────────────────────────────────
   const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
   if (codeFromUrl) {
+    showScreen('link');
     document.getElementById('device_id_link').value = codeFromUrl;
+    // Auto-link immediately when arriving via QR code scan
+    linkDevice();
+  } else {
+    showScreen('link');
   }
-
-  showScreen('link');
 </script>
 
 </body>
