@@ -486,7 +486,7 @@
   async function activateDevice() {
     if (!currentDeviceId) { setMsg('No device linked.', 'error'); return; }
 
-    const status = currentDeviceRow?.status || 'inactive';
+    const status = (currentDeviceRow && currentDeviceRow.status) ? currentDeviceRow.status : 'inactive';
     if (status === 'active' || status === 'free_trial') {
       setMsg('This device is already active.', 'success');
       return;
