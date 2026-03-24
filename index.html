@@ -589,18 +589,6 @@
       return;
     }
 
-    const isM3u = payload.playlist_url.toLowerCase().endsWith('.m3u') || payload.playlist_url.toLowerCase().endsWith('.m3u8');
-
-    if (!payload.playlist_url || (!isM3u && (!payload.username || !payload.password))) {
-      setMsg('Portal URL, Username, and Password are required.', 'error');
-      return;
-    }
-
-    if (isM3u) {
-      payload.username = ''; 
-      payload.password = '';
-      return;
-    }
 
     if (!payload.playlist_url.startsWith('http://') && !payload.playlist_url.startsWith('https://')) {
       setMsg('Portal URL must start with http:// or https://', 'error');
