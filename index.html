@@ -601,6 +601,11 @@
       return;
     }
 
+
+console.log('Reached insert', payload);
+cancelTransmissionTimer();
+
+
     // Cancel any previous pending transmission
     cancelTransmissionTimer();
 
