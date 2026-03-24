@@ -437,24 +437,24 @@
   }
 
   async function getOrCreateDevice(deviceId) {
-    const { data, error } = await sb
+    const _res1 = await sb
       .from('devices')
       .select('*')
       .eq('device_id', deviceId)
       .limit(1);
 
-    if (error) throw new Error(error.message);
+    if (_res1.error) throw new Error(_res1.error.message);
 
-    if (data && data.length > 0) return data[0];
+    if (_res1.data && _res1.data.length > 0) return _res1.data[0];
 
-    const { data: inserted, error: insertErr } = await sb
+    const _res2 = await sb
       .from('devices')
       .insert([{ device_id: deviceId, status: 'inactive' }])
       .select();
 
-    if (insertErr) throw new Error(insertErr.message);
-    if (!inserted || inserted.length === 0) throw new Error('Could not create device record.');
-    return inserted[0];
+    if (_res2.error) throw new Error(_res2.error.message);
+    if (!_res2.data || _res2.data.length === 0) throw new Error('Could not create device record.');
+    return _res2.data[0];
   }
 
   // ─────────────────────────────────────────────
@@ -500,15 +500,15 @@
     const expiryIso = expiry.toISOString().split('T')[0];
 
     try {
-      const { data, error } = await sb
+      const _res3 = await sb
         .from('devices')
         .update({ status: 'free_trial', expiry_date: expiryIso })
         .eq('device_id', currentDeviceId)
         .select();
 
-      if (error) throw new Error(error.message);
+      if (_res3.error) throw new Error(_res3.error.message);
 
-      const updated = data && data.length > 0 ? data[0] : { ...currentDeviceRow, status: 'free_trial', expiry_date: expiryIso };
+      const updated = (_res3.data && _res3.data.length > 0) ? _res3.data[0] : Object.assign({}, currentDeviceRow, { status: 'free_trial', expiry_date: expiryIso });
       currentDeviceRow = updated;
       populateDashboard(updated);
       setMsg(✓ Free trial activated! Expires ${formatExpiry(expiryIso)}., 'success');
@@ -545,12 +545,12 @@
 
     pickupPollInterval = setInterval(async () => {
       if (!pendingLinkId) return;
-      const { data } = await sb
+      const _res4 = await sb
         .from('device_links')
         .select('id')
         .eq('id', Number(pendingLinkId))
         .limit(1);
-      if (!data || data.length === 0) {
+      if (!_res4.data || _res4.data.length === 0) {
         cancelTransmissionTimer();
         setMsg('✓ Playlist received by your TV!', 'success');
         setBtn('btnAddPlaylist', 'Add Playlist', false);
@@ -564,11 +564,11 @@
       pickupPollInterval = null;
 
       if (pendingLinkId) {
-        const { error: delErr } = await sb
+        const _res5 = await sb
           .from('device_links')
           .delete()
           .eq('id', Number(pendingLinkId));
-        if (delErr) console.error('Auto-delete failed:', delErr.message);
+        if (_res5.error) console.error('Auto-delete failed:', _res5.error.message);
         pendingLinkId = null;
       }
 
@@ -633,26 +633,26 @@
     setBtn('btnAddPlaylist', 'Sending…', true);
     setMsg('Sending to your TV…');
 
-    const { data, error } = await sb
+    const _res6 = await sb
       .from('device_links')
       .insert([payload])
       .select('id');
 
-    if (error) {
-      setMsg('Error: ' + error.message, 'error');
+    if (_res6.error) {
+      setMsg('Error: ' + _res6.error.message, 'error');
       setBtn('btnAddPlaylist', 'Add Playlist', false);
       return;
     }
 
     // Clear form
-    ['playlist_name','playlist_url','username','password'].forEach(id => {
+    ['playlist_name','playlist_url','username','password'].forEach(function(id) {
       document.getElementById(id).value = '';
     });
     document.getElementById('device_id_playlist').value = currentDeviceId;
     document.getElementById('m3uHint').classList.remove('visible');
     document.getElementById('xtreamFields').classList.remove('hidden');
 
-    const insertedId = data && data.length > 0 ? data[0].id : null;
+    const insertedId = (_res6.data && _res6.data.length > 0) ? _res6.data[0].id : null;
     if (insertedId) {
       startTransmissionTimer(insertedId);
     } else {
