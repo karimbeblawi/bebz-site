@@ -485,6 +485,98 @@
       text-align: right;
     }
 
+    /* Plan cards */
+    .plan-card {
+      background: var(--bg2);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.1s;
+      position: relative;
+      overflow: hidden;
+    }
+    .plan-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .plan-card.selected { border-color: var(--accent); background: rgba(59,130,246,0.08); }
+
+    .plan-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .plan-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .plan-desc { font-size: 13px; color: var(--muted); }
+    .plan-price {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 24px;
+      color: var(--text);
+    }
+    .plan-price span { font-size: 14px; color: var(--muted); font-weight: 400; }
+    .plan-badge {
+      display: inline-block;
+      background: rgba(59,130,246,0.2);
+      color: var(--accent2);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-top: 10px;
+    }
+
+    /* Payment result banner */
+    .payment-banner {
+      padding: 14px 18px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      display: none;
+    }
+    .payment-banner.success {
+      background: #14532d;
+      color: #4ade80;
+      display: block;
+    }
+    .payment-banner.cancelled {
+      background: #450a0a;
+      color: #f87171;
+      display: block;
+    }
+
+    /* ── Plan cards ── */
+    .plan-card {
+      background: var(--bg2);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.1s;
+      position: relative;
+    }
+    .plan-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .plan-card.selected { border-color: var(--accent); background: rgba(59,130,246,0.08); }
+
+    .plan-header { display: flex; justify-content: space-between; align-items: center; }
+    .plan-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; color: var(--text); margin-bottom: 4px; }
+    .plan-desc { font-size: 13px; color: var(--muted); }
+    .plan-price { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 24px; color: var(--text); white-space: nowrap; }
+    .plan-price span { font-size: 14px; color: var(--muted); font-weight: 400; }
+    .plan-badge { display: inline-block; background: rgba(59,130,246,0.2); color: var(--accent2); font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-top: 10px; }
+
+    /* ── Payment result banner ── */
+    .payment-banner { padding: 14px 18px; border-radius: 10px; margin-bottom: 16px; font-size: 14px; font-weight: 500; display: none; }
+    .payment-banner.success { background: #14532d; color: #4ade80; display: block; }
+    .payment-banner.cancelled { background: #450a0a; color: #f87171; display: block; }
+
     @media (max-width: 600px) {
       nav { padding: 20px 24px; }
       .nav-links { display: none; }
@@ -572,6 +664,7 @@
 
   <!-- SCREEN: Link -->
   <section id="screen-link">
+    <div id="paymentBanner" class="payment-banner"></div>
     <h1 class="card-logo">Bebz<span>TV</span></h1>
     <p class="small-note" style="margin-bottom:22px;">Link your device to activate it or add a playlist.</p>
 
@@ -603,15 +696,16 @@
       </div>
     </div>
 
-    <button id="btnGoActivate">Activate / Start Trial</button>
+    <button id="btnGoActivate">Start Free Trial</button>
+    <button id="btnGoSubscribe" class="secondary">Subscribe</button>
     <button id="btnGoPlaylist" class="secondary">Add Playlist</button>
     <hr class="divider-line" />
     <button id="btnBackToLink" class="secondary">← Back</button>
   </section>
 
-  <!-- SCREEN: Activate -->
+  <!-- SCREEN: Activate (Free Trial) -->
   <section id="screen-activate" class="hidden">
-    <h2 class="card-title">Activate Device</h2>
+    <h2 class="card-title">Start Free Trial</h2>
 
     <div class="info-box">
       <div class="info-row">
@@ -628,13 +722,54 @@
       </div>
     </div>
 
-    <button id="btnActivateNow">Start 7-Day Free Trial</button>
+    <button id="btnActivateNow">Start 30-Day Free Trial</button>
     <button id="btnBackToDashboardA" class="secondary">← Back</button>
 
     <div class="small-note" id="activateNote">
-      Starting a trial sets your status to <strong>free_trial</strong> for 7 days.
-      Payment integration coming soon.
+      No credit card required. After 30 days, subscribe to keep watching.
     </div>
+  </section>
+
+  <!-- SCREEN: Subscribe -->
+  <section id="screen-subscribe" class="hidden">
+    <h2 class="card-title">Choose a Plan</h2>
+
+    <div class="info-box" style="margin-bottom:20px;">
+      <div class="info-row">
+        <span class="info-label">Device ID</span>
+        <span id="subscribeDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Status</span>
+        <span id="subscribeStatus" class="status-pill inactive">inactive</span>
+      </div>
+    </div>
+
+    <div id="plan-annual" class="plan-card" onclick="selectPlan('annual')">
+      <div class="plan-header">
+        <div>
+          <div class="plan-name">Annual</div>
+          <div class="plan-desc">Full access, renewed yearly</div>
+        </div>
+        <div class="plan-price">$8.99<span>/yr</span></div>
+      </div>
+      <div class="plan-badge">Most Popular</div>
+    </div>
+
+    <div id="plan-lifetime" class="plan-card" onclick="selectPlan('lifetime')">
+      <div class="plan-header">
+        <div>
+          <div class="plan-name">Lifetime</div>
+          <div class="plan-desc">Pay once, watch forever</div>
+        </div>
+        <div class="plan-price">$19.99<span></span></div>
+      </div>
+    </div>
+
+    <button id="btnCheckout" disabled>Continue to Payment</button>
+    <button id="btnBackToDashboardC" class="secondary">← Back</button>
+
+    <div class="small-note">Secure payment by Stripe. Cancel anytime (Annual plan).</div>
   </section>
 
   <!-- SCREEN: Playlist -->
@@ -682,7 +817,412 @@
   const SUPABASE_URL = 'https://qsmuvkwhrzbydncdiphu.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_GXoX0HbGSg4njByYEmRPAw_B7sRBLDI';
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  const TRIAL_DAYS = 7;
+  const TRIAL_DAYS = 30;
+
+  let currentDeviceId  = '';
+  let currentDeviceRow = null;
+  let selectedPlan     = null;
+
+  // ── Screens ──
+  const screens = {
+    link:      document.getElementById('screen-link'),
+    dashboard: document.getElementById('screen-dashboard'),
+    activate:  document.getElementById('screen-activate'),
+    subscribe: document.getElementById('screen-subscribe'),
+    playlist:  document.getElementById('screen-playlist'),
+  };
+
+  function showScreen(name) {
+    Object.values(screens).forEach(s => s.classList.add('hidden'));
+    screens[name].classList.remove('hidden');
+    setMsg('');
+    if (name !== 'link') {
+      document.getElementById('device-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function setMsg(text, type) {
+    const el = document.getElementById('msg');
+    el.textContent = text || '';
+    el.className = type || '';
+  }
+
+  function setBtn(id, text, disabled) {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.textContent = text;
+    b.disabled = !!disabled;
+  }
+
+  // ── Formatting ──
+  function formatExpiry(value) {
+    if (!value) return 'Never (Lifetime)';
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return value;
+    return d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+  }
+
+  function expiryCountdown(value) {
+    if (!value) return null;
+    const exp = new Date(value);
+    if (isNaN(exp.getTime())) return null;
+    const diffDays = Math.ceil((exp - Date.now()) / 86400000);
+    if (diffDays < 0)   return { text: 'expired',           cls: 'over' };
+    if (diffDays === 0) return { text: 'expires today',     cls: 'warn' };
+    if (diffDays <= 3)  return { text: diffDays + 'd left', cls: 'warn' };
+    return                     { text: diffDays + 'd left', cls: '' };
+  }
+
+  function applyStatusPill(el, status) {
+    el.className = 'status-pill ' + (status || 'inactive');
+    el.textContent = (status || 'inactive').replace('_', ' ');
+  }
+
+  // ── Dashboard ──
+  function populateDashboard(row) {
+    const id     = row.device_id   || '';
+    const status = row.status      || 'inactive';
+    const expiry = row.expiry_date || null;
+
+    document.getElementById('dashDeviceId').textContent = id;
+    applyStatusPill(document.getElementById('dashStatus'), status);
+    document.getElementById('dashExpiry').textContent = formatExpiry(expiry);
+
+    const noteEl = document.getElementById('dashExpiryNote');
+    const cd = expiryCountdown(expiry);
+    if (cd) {
+      noteEl.textContent = '(' + cd.text + ')';
+      noteEl.className   = 'expiry-note ' + cd.cls;
+      noteEl.classList.remove('hidden');
+    } else {
+      noteEl.classList.add('hidden');
+    }
+
+    document.getElementById('activateDeviceId').textContent = id;
+    applyStatusPill(document.getElementById('activateStatus'), status);
+    document.getElementById('activateExpiry').textContent = formatExpiry(expiry);
+
+    document.getElementById('subscribeDeviceId').textContent = id;
+    applyStatusPill(document.getElementById('subscribeStatus'), status);
+
+    document.getElementById('device_id_playlist').value = id;
+
+    const alreadyActive = (status === 'active' || status === 'free_trial');
+    const trialUsed = (status !== 'inactive');
+
+    // Show/hide activate button based on whether trial was used
+    const btnActivate = document.getElementById('btnGoActivate');
+    if (trialUsed) {
+      btnActivate.textContent = 'Start Free Trial';
+      btnActivate.disabled = true;
+    } else {
+      btnActivate.textContent = 'Start Free Trial';
+      btnActivate.disabled = false;
+    }
+
+    // Subscribe button
+    const btnSubscribe = document.getElementById('btnGoSubscribe');
+    if (status === 'active' && !expiry) {
+      btnSubscribe.textContent = 'Lifetime ✓';
+      btnSubscribe.disabled = true;
+    } else {
+      btnSubscribe.textContent = alreadyActive ? 'Renew / Upgrade' : 'Subscribe';
+      btnSubscribe.disabled = false;
+    }
+
+    const btnAct = document.getElementById('btnActivateNow');
+    if (alreadyActive) {
+      btnAct.textContent = 'Already Active';
+      btnAct.disabled = true;
+    } else {
+      btnAct.textContent = 'Start 30-Day Free Trial';
+      btnAct.disabled = false;
+    }
+  }
+
+  // ── Helpers ──
+  function normalizeDeviceId(v) { return (v || '').trim().toUpperCase(); }
+  function getQueryParam(name) { return new URLSearchParams(window.location.search).get(name) || ''; }
+
+  async function getOrCreateDevice(deviceId) {
+    const r1 = await sb.from('devices').select('*').eq('device_id', deviceId).limit(1);
+    if (r1.error) throw new Error(r1.error.message);
+    if (r1.data && r1.data.length > 0) return r1.data[0];
+
+    const r2 = await sb.from('devices').insert([{ device_id: deviceId, status: 'inactive' }]).select();
+    if (r2.error) throw new Error(r2.error.message);
+    if (!r2.data || r2.data.length === 0) throw new Error('Could not create device record.');
+    return r2.data[0];
+  }
+
+  // ── Link Device ──
+  async function linkDevice() {
+    const id = normalizeDeviceId(document.getElementById('device_id_link').value);
+    if (!id) { setMsg('Please enter a Device ID.', 'error'); return; }
+
+    setBtn('btnLinkDevice', 'Linking…', true);
+    setMsg('Looking up device…');
+
+    try {
+      const row = await getOrCreateDevice(id);
+      currentDeviceId  = row.device_id;
+      currentDeviceRow = row;
+      populateDashboard(row);
+      showScreen('dashboard');
+    } catch (err) {
+      setMsg('Error: ' + err.message, 'error');
+    } finally {
+      setBtn('btnLinkDevice', 'Link Device', false);
+    }
+  }
+
+  // ── Activate (Free Trial) ──
+  async function activateDevice() {
+    if (!currentDeviceId) { setMsg('No device linked.', 'error'); return; }
+
+    const status = (currentDeviceRow && currentDeviceRow.status) ? currentDeviceRow.status : 'inactive';
+    if (status === 'active' || status === 'free_trial') {
+      setMsg('This device is already active.', 'success');
+      return;
+    }
+
+    setBtn('btnActivateNow', 'Activating…', true);
+    setMsg('Starting free trial…');
+
+    const expiry = new Date();
+    expiry.setDate(expiry.getDate() + TRIAL_DAYS);
+    const expiryIso = expiry.toISOString().split('T')[0];
+
+    try {
+      const r = await sb.from('devices').update({ status: 'free_trial', expiry_date: expiryIso }).eq('device_id', currentDeviceId).select();
+      if (r.error) throw new Error(r.error.message);
+
+      const updated = (r.data && r.data.length > 0) ? r.data[0] : Object.assign({}, currentDeviceRow, { status: 'free_trial', expiry_date: expiryIso });
+      currentDeviceRow = updated;
+      populateDashboard(updated);
+      setMsg('✓ Free trial started! Expires ' + formatExpiry(expiryIso) + '.', 'success');
+
+      document.getElementById('activateNote').innerHTML =
+        '✓ Trial active until <strong>' + formatExpiry(expiryIso) + '</strong>. Return to your TV — it will update automatically.';
+    } catch (err) {
+      setMsg('Error: ' + err.message, 'error');
+      setBtn('btnActivateNow', 'Start 30-Day Free Trial', false);
+    }
+  }
+
+  // ── Plan Selection ──
+  function selectPlan(plan) {
+    selectedPlan = plan;
+    document.querySelectorAll('.plan-card').forEach(function(c) { c.classList.remove('selected'); });
+    document.getElementById('plan-' + plan).classList.add('selected');
+    setBtn('btnCheckout', 'Continue to Payment →', false);
+  }
+
+  // ── Stripe Checkout ──
+  async function startCheckout() {
+    if (!selectedPlan) { setMsg('Please select a plan.', 'error'); return; }
+    if (!currentDeviceId) { setMsg('No device linked.', 'error'); return; }
+
+    setBtn('btnCheckout', 'Redirecting…', true);
+    setMsg('Opening secure payment…');
+
+    try {
+      const response = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id: currentDeviceId, plan: selectedPlan }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+      if (!data.url) throw new Error('No checkout URL returned');
+
+      window.location.href = data.url;
+
+    } catch (err) {
+      setMsg('Error: ' + err.message, 'error');
+      setBtn('btnCheckout', 'Continue to Payment →', false);
+    }
+  }
+
+  // ── Transmission Timer ──
+  const TRANSMISSION_TIMEOUT_MS = 2 * 60 * 1000;
+  const PICKUP_POLL_MS = 3000;
+  let transmissionTimer  = null;
+  let pendingLinkId      = null;
+  let countdownInterval  = null;
+  let pickupPollInterval = null;
+
+  function startTransmissionTimer(linkId) {
+    pendingLinkId = linkId;
+    let secondsLeft = TRANSMISSION_TIMEOUT_MS / 1000;
+    updateCountdownMsg(secondsLeft);
+
+    countdownInterval = setInterval(function() {
+      secondsLeft -= 1;
+      if (secondsLeft > 0) updateCountdownMsg(secondsLeft);
+    }, 1000);
+
+    pickupPollInterval = setInterval(async function() {
+      if (!pendingLinkId) return;
+      const r = await sb.from('device_links').select('id').eq('id', Number(pendingLinkId)).limit(1);
+      if (!r.data || r.data.length === 0) {
+        cancelTransmissionTimer();
+        setMsg('✓ Playlist received by your TV!', 'success');
+        setBtn('btnAddPlaylist', 'Add Playlist', false);
+      }
+    }, PICKUP_POLL_MS);
+
+    transmissionTimer = setTimeout(async function() {
+      clearInterval(countdownInterval);  countdownInterval  = null;
+      clearInterval(pickupPollInterval); pickupPollInterval = null;
+      if (pendingLinkId) {
+        await sb.from('device_links').delete().eq('id', Number(pendingLinkId));
+        pendingLinkId = null;
+      }
+      setMsg('Transmission failed — TV did not respond. Make sure your TV is on and the app is open, then try again.', 'error');
+      setBtn('btnAddPlaylist', 'Add Playlist', false);
+    }, TRANSMISSION_TIMEOUT_MS);
+  }
+
+  function cancelTransmissionTimer() {
+    if (transmissionTimer)  { clearTimeout(transmissionTimer);   transmissionTimer  = null; }
+    if (countdownInterval)  { clearInterval(countdownInterval);  countdownInterval  = null; }
+    if (pickupPollInterval) { clearInterval(pickupPollInterval); pickupPollInterval = null; }
+    pendingLinkId = null;
+  }
+
+  function updateCountdownMsg(secondsLeft) {
+    const m = Math.floor(secondsLeft / 60);
+    const s = secondsLeft % 60;
+    setMsg('✓ Playlist sent! Waiting for your TV… (' + (m > 0 ? m + 'm ' : '') + s + 's)', 'success');
+  }
+
+  // ── Add Playlist ──
+  async function addPlaylist() {
+    const url      = document.getElementById('playlist_url').value.trim();
+    const name     = document.getElementById('playlist_name').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const isM3u    = url.toLowerCase().endsWith('.m3u') || url.toLowerCase().endsWith('.m3u8');
+
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); showScreen('link'); return; }
+    if (!url) { setMsg('Portal URL is required.', 'error'); return; }
+    if (!url.startsWith('http://') && !url.startsWith('https://')) { setMsg('URL must start with http:// or https://', 'error'); return; }
+    if (!isM3u && (!username || !password)) { setMsg('Portal URL, Username, and Password are required.', 'error'); return; }
+
+    const payload = {
+      device_id:     currentDeviceId,
+      playlist_name: name || (isM3u ? 'M3U Playlist' : 'My Playlist'),
+      playlist_url:  url,
+      username:      isM3u ? '' : username,
+      password:      isM3u ? '' : password,
+      consumed:      false,
+    };
+
+    cancelTransmissionTimer();
+    setBtn('btnAddPlaylist', 'Sending…', true);
+    setMsg('Sending to your TV…');
+
+    const r = await sb.from('device_links').insert([payload]).select('id');
+    if (r.error) { setMsg('Error: ' + r.error.message, 'error'); setBtn('btnAddPlaylist', 'Add Playlist', false); return; }
+
+    ['playlist_name','playlist_url','username','password'].forEach(function(id) {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('device_id_playlist').value = currentDeviceId;
+
+    const insertedId = (r.data && r.data.length > 0) ? r.data[0].id : null;
+    if (insertedId) {
+      startTransmissionTimer(insertedId);
+    } else {
+      setMsg('✓ Playlist sent! Your TV will load it within seconds.', 'success');
+      setBtn('btnAddPlaylist', 'Add Playlist', false);
+    }
+  }
+
+  // ── Event Listeners ──
+  document.getElementById('btnLinkDevice').addEventListener('click', linkDevice);
+  document.getElementById('device_id_link').addEventListener('keydown', function(e) { if (e.key === 'Enter') linkDevice(); });
+
+  document.getElementById('btnGoActivate').addEventListener('click', function() {
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
+    showScreen('activate');
+  });
+
+  document.getElementById('btnGoSubscribe').addEventListener('click', function() {
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
+    selectedPlan = null;
+    document.querySelectorAll('.plan-card').forEach(function(c) { c.classList.remove('selected'); });
+    setBtn('btnCheckout', 'Continue to Payment', true);
+    showScreen('subscribe');
+  });
+
+  document.getElementById('btnGoPlaylist').addEventListener('click', function() {
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
+    showScreen('playlist');
+  });
+
+  document.getElementById('btnActivateNow').addEventListener('click', activateDevice);
+  document.getElementById('btnCheckout').addEventListener('click', startCheckout);
+  document.getElementById('btnAddPlaylist').addEventListener('click', addPlaylist);
+
+  document.getElementById('btnBackToLink').addEventListener('click', function() { showScreen('link'); });
+  document.getElementById('btnBackToDashboardA').addEventListener('click', function() { showScreen('dashboard'); });
+  document.getElementById('btnBackToDashboardB').addEventListener('click', function() { cancelTransmissionTimer(); showScreen('dashboard'); });
+  document.getElementById('btnBackToDashboardC').addEventListener('click', function() { showScreen('dashboard'); });
+
+  // ── Handle payment return from Stripe ──
+  function handlePaymentReturn() {
+    const payment = getQueryParam('payment');
+    const deviceFromUrl = normalizeDeviceId(getQueryParam('device'));
+    const plan = getQueryParam('plan');
+
+    if (!payment) return false;
+
+    const banner = document.getElementById('paymentBanner');
+
+    if (payment === 'success') {
+      banner.className = 'payment-banner success';
+      banner.textContent = '✓ Payment successful! Your ' + (plan === 'lifetime' ? 'lifetime' : 'annual') + ' subscription is now active. Return to your TV.';
+      // Auto-link the device
+      if (deviceFromUrl) {
+        document.getElementById('device_id_link').value = deviceFromUrl;
+        linkDevice();
+      } else {
+        showScreen('link');
+      }
+      return true;
+    }
+
+    if (payment === 'cancelled') {
+      banner.className = 'payment-banner cancelled';
+      banner.textContent = 'Payment was cancelled. You can try again anytime.';
+      if (deviceFromUrl) {
+        document.getElementById('device_id_link').value = deviceFromUrl;
+        linkDevice();
+      } else {
+        showScreen('link');
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  // ── QR Auto-link + Payment Return ──
+  const handled = handlePaymentReturn();
+  if (!handled) {
+    const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
+    if (codeFromUrl) {
+      document.getElementById('device_id_link').value = codeFromUrl;
+      document.getElementById('device-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      linkDevice();
+    } else {
+      showScreen('link');
+    }
+  }
 
   let currentDeviceId  = '';
   let currentDeviceRow = null;
