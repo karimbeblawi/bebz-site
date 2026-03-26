@@ -701,60 +701,28 @@
     }
   }
 
-  // Handle return from Stripe
-  (function() {
-    var payment = new URLSearchParams(window.location.search).get('payment');
-    var deviceFromUrl = (new URLSearchParams(window.location.search).get('device') || '').trim().toUpperCase();
-    var plan = new URLSearchParams(window.location.search).get('plan') || '';
-    if (!payment) return;
-    if (payment === 'success') {
-      setMsg('✓ Payment successful! Your ' + (plan === 'lifetime' ? 'lifetime' : 'annual') + ' subscription is now active. Return to your TV.', 'success');
-    } else if (payment === 'cancelled') {
-      setMsg('Payment was cancelled. You can try again anytime.', 'error');
-    }
-  })();
-
   // ─────────────────────────────────────────────
-  // Event listeners
+  // Startup: handle QR scan or Stripe payment return
   // ─────────────────────────────────────────────
-  document.getElementById('btnLinkDevice').addEventListener('click', linkDevice);
-  document.getElementById('device_id_link').addEventListener('keydown', e => { if (e.key === 'Enter') linkDevice(); });
+  const paymentReturn     = getQueryParam('payment');
+  const deviceFromPayment = normalizeDeviceId(getQueryParam('device'));
+  const planFromPayment   = getQueryParam('plan');
+  const codeFromUrl       = normalizeDeviceId(getQueryParam('code'));
 
-  document.getElementById('btnGoSubscribe').addEventListener('click', () => {
-    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
-    showScreen('subscribe');
-  });
-
-  document.getElementById('btnGoActivate').addEventListener('click', () => {
-    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
-    showScreen('activate');
-  });
-
-  document.getElementById('btnGoPlaylist').addEventListener('click', () => {
-    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
-    showScreen('playlist');
-  });
-
-  document.getElementById('btnActivateNow').addEventListener('click', activateDevice);
-  document.getElementById('btnCheckout').addEventListener('click', startCheckout);
-
-  document.getElementById('btnAddPlaylist').addEventListener('click', addPlaylist);
-
-  document.getElementById('btnBackToLink').addEventListener('click',       () => showScreen('link'));
-  document.getElementById('btnBackToDashboardA').addEventListener('click', () => showScreen('dashboard'));
-  document.getElementById('btnBackToDashboardC').addEventListener('click', () => showScreen('dashboard'));
-
-  document.getElementById('btnBackToDashboardB').addEventListener('click', () => {
-    cancelTransmissionTimer();
-    showScreen('dashboard');
-  });
-
-  // ─────────────────────────────────────────────
-  // Auto-fill device ID from QR code URL param
-  // ─────────────────────────────────────────────
-  const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
   showScreen('link');
-  if (codeFromUrl) {
+
+  if (paymentReturn && deviceFromPayment) {
+    // Returning from Stripe -- link device then show result message
+    document.getElementById('device_id_link').value = deviceFromPayment;
+    linkDevice().then(function() {
+      if (paymentReturn === 'success') {
+        setMsg('\u2713 Payment successful! Your ' + (planFromPayment === 'lifetime' ? 'lifetime' : 'annual') + ' subscription is now active. Return to your TV.', 'success');
+      } else if (paymentReturn === 'cancelled') {
+        setMsg('Payment was cancelled. You can try again anytime.', 'error');
+      }
+    });
+  } else if (codeFromUrl) {
+    // QR code scan
     document.getElementById('device_id_link').value = codeFromUrl;
     linkDevice();
   }
