@@ -1,11 +1,10 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 var PRICE_IDS = {
-  annual:   'price_1TFMJSDygJnG7IrzoolT97kl',
-  lifetime: 'price_1TFMLQDygJnG7IrzkoYXGR9v',
+  annual:   'price_1TFPRDRY7XEptPcwOWo3bFVD',
+  lifetime: 'price_1TFPRDRY7XEptPcwET2G0VBA',
 };
 
-// Direct export -- NOT module.exports.default
 module.exports = async function(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
