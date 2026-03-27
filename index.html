@@ -4,70 +4,338 @@
   <meta charset="UTF-8" />
   <meta http-equiv="Cache-Control" content="no-store" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bebz TV</title>
+  <title>Bebz TV — IPTV Player for Roku</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080e1a;
+      --bg2:       #0d1528;
+      --card:      #111827;
+      --border:    #1e2d45;
+      --accent:    #3b82f6;
+      --accent2:   #60a5fa;
+      --text:      #f0f4ff;
+      --muted:     #8494b0;
+      --success:   #4ade80;
+      --error:     #f87171;
+    }
+
+    html { scroll-behavior: smooth; }
 
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1220;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── GLOW ORBS ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: rgba(59,130,246,0.12);
+      top: -200px; left: -150px;
+    }
+    .orb-2 {
+      width: 400px; height: 400px;
+      background: rgba(96,165,250,0.08);
+      bottom: 100px; right: -100px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 48px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--accent2); }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 100px 24px 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.25);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 13px;
+      color: var(--accent2);
+      font-weight: 500;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent2);
+      border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(42px, 7vw, 72px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent2), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 580px;
+      margin: 0 auto 48px;
+      font-weight: 300;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: var(--accent);
       color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 0 30px rgba(59,130,246,0.3);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+      box-shadow: 0 0 40px rgba(59,130,246,0.4);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 24px 100px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(59,130,246,0.4);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 20px 24px 60px;
+    }
+
+    .section-divider h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--muted);
+    }
+
+    /* ── DEVICE MANAGEMENT SECTION ── */
+    #device-section {
+      position: relative;
+      z-index: 1;
       display: flex;
       justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      padding: 0 24px 100px;
     }
 
     .card {
       width: 100%;
       max-width: 420px;
-      background: #121a2b;
-      padding: 28px;
-      border-radius: 14px;
-      box-shadow: 0 0 24px rgba(0,0,0,0.45);
-    }
-
-    h1 { margin: 0 0 8px; font-size: 24px; text-align: center; }
-    h2 { margin: 0 0 18px; font-size: 20px; text-align: center; }
-
-    p.sub {
-      margin: 0 0 22px;
-      color: #9ca3af;
-      text-align: center;
-      font-size: 14px;
-      line-height: 1.5;
+      background: var(--card);
+      padding: 32px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 60px rgba(0,0,0,0.4);
     }
 
     .hidden { display: none !important; }
 
     .field-label {
       font-size: 13px;
-      color: #9ca3af;
+      color: var(--muted);
       margin-bottom: 6px;
       display: block;
+      font-weight: 500;
     }
 
     input {
       width: 100%;
-      padding: 12px;
+      padding: 12px 14px;
       margin-bottom: 14px;
       border-radius: 8px;
-      border: none;
+      border: 1px solid var(--border);
       outline: none;
-      background: #1c253a;
-      color: white;
+      background: var(--bg2);
+      color: var(--text);
       font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.15s;
     }
 
-    input[readonly] { opacity: 0.9; cursor: default; }
+    input:focus { border-color: var(--accent); }
+    input[readonly] { opacity: 0.8; cursor: default; }
 
     .info-box {
-      background: #1c253a;
+      background: var(--bg2);
+      border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 14px;
+      padding: 16px;
       margin-bottom: 16px;
     }
 
@@ -80,104 +348,244 @@
     .info-row:last-child { margin-bottom: 0; }
 
     .info-label {
-      color: #9ca3af;
+      color: var(--muted);
       width: 110px;
       flex-shrink: 0;
+      font-size: 13px;
     }
 
-    /* Status pill with dynamic colours */
     .status-pill {
       display: inline-block;
       padding: 4px 10px;
       border-radius: 999px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       text-transform: capitalize;
-      background: #2b3448;
-      color: #9ca3af;
+      background: #1e2d45;
+      color: var(--muted);
     }
-    .status-pill.active     { background: #14532d; color: #4ade80; }
-    .status-pill.free_trial { background: #1e3a5f; color: #60a5fa; }
-    .status-pill.expired    { background: #450a0a; color: #f87171; }
-    .status-pill.inactive   { background: #2b3448; color: #9ca3af; }
+    .status-pill.active     { background: #14532d; color: var(--success); }
+    .status-pill.free_trial { background: #1e3a5f; color: var(--accent2); }
+    .status-pill.expired    { background: #450a0a; color: var(--error); }
+    .status-pill.inactive   { background: #1e2d45; color: var(--muted); }
 
-    /* Expiry countdown badge */
     .expiry-note {
       font-size: 12px;
-      color: #60a5fa;
+      color: var(--accent2);
       margin-left: 8px;
     }
     .expiry-note.warn { color: #f59e0b; }
-    .expiry-note.over { color: #f87171; }
+    .expiry-note.over { color: var(--error); }
 
     button {
       width: 100%;
       padding: 12px;
-      background: #3b82f6;
+      background: var(--accent);
       border: none;
       border-radius: 8px;
       color: white;
-      font-weight: bold;
+      font-weight: 600;
       font-size: 15px;
       cursor: pointer;
       margin-bottom: 12px;
       transition: background 0.15s;
+      font-family: 'Inter', sans-serif;
     }
-    button:hover  { background: #2563eb; }
+    button:hover { background: #2563eb; }
     button:disabled { background: #1e3a5f; color: #4b6a9a; cursor: not-allowed; }
 
-    button.secondary           { background: #263248; }
-    button.secondary:hover     { background: #334155; }
-    button.secondary:disabled  { background: #1a2233; color: #4b6a9a; cursor: not-allowed; }
-
-    button.success { background: #15803d; }
+    button.secondary           { background: #1a2640; color: var(--muted); border: 1px solid var(--border); }
+    button.secondary:hover     { background: #243150; color: var(--text); }
+    button.secondary:disabled  { background: #111827; color: #4b6a9a; cursor: not-allowed; }
 
     #msg {
       margin-top: 10px;
       font-size: 14px;
       text-align: center;
-      color: #9ca3af;
+      color: var(--muted);
       min-height: 20px;
       line-height: 1.4;
     }
-    #msg.error   { color: #f87171; }
-    #msg.success { color: #4ade80; }
+    #msg.error   { color: var(--error); }
+    #msg.success { color: var(--success); }
 
     .small-note {
-      color: #9ca3af;
+      color: var(--muted);
       font-size: 13px;
       line-height: 1.5;
       text-align: center;
       margin-top: 8px;
     }
 
-    .divider {
+    .divider-line {
       border: none;
-      border-top: 1px solid #1e293b;
+      border-top: 1px solid var(--border);
       margin: 16px 0;
+    }
+
+    h2.card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1.card-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 26px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    h1.card-logo span { color: var(--accent2); }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: gap;
+      gap: 16px;
+    }
+
+    .footer-left {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    .footer-left span { color: var(--accent2); }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.15s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      footer { flex-direction: column; text-align: center; }
+      .footer-copy { text-align: center; }
     }
   </style>
 </head>
 
 <body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">Bebz<span>TV</span></a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#device-section">Manage Device</a></li>
+    <li><a href="mailto:support@bebz.tv">Support</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">Now available on Roku</div>
+
+  <h1>Your IPTV,<br><span>beautifully played.</span></h1>
+
+  <p>Bebz TV is a fast, elegant IPTV player for Roku. Connect your own playlist from any provider and instantly enjoy live TV, movies, and series — with full Arabic support.</p>
+
+  <div class="hero-cta">
+    <a href="#device-section" class="btn-primary">
+      ⚙️ Manage My Device
+    </a>
+    <a href="https://channelstore.roku.com" class="btn-secondary" target="_blank">
+      📺 Get on Roku
+    </a>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="feature-card">
+    <div class="feature-icon">📡</div>
+    <h3>Xtream & M3U Support</h3>
+    <p>Connect any IPTV provider using Xtream Codes or an M3U playlist URL. No restrictions.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🌍</div>
+    <h3>Full Arabic Support</h3>
+    <p>Native right-to-left Arabic text rendering throughout the app — built for Arabic-speaking audiences.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🎬</div>
+    <h3>Live, Movies & Series</h3>
+    <p>Browse live channels with live preview, VOD movies with details, and full series with episode navigation.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">❤️</div>
+    <h3>Favorites & Continue Watching</h3>
+    <p>Save your favourite channels and pick up movies right where you left off.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">📋</div>
+    <h3>Multiple Playlists</h3>
+    <p>Add and switch between multiple playlists instantly. Each playlist keeps its own favorites and history.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">✨</div>
+    <h3>Smart Screensaver</h3>
+    <p>A beautiful screensaver that showcases movie and series art from your own playlist.</p>
+  </div>
+</section>
+
+<!-- SECTION LABEL -->
+<div class="section-divider" id="device-section-label">
+  <h2>Device Management</h2>
+</div>
+
+<!-- DEVICE MANAGEMENT CARD -->
+<section id="device-section">
 <div class="card">
 
-  <!-- ── SCREEN: Link ── -->
+  <!-- SCREEN: Link -->
   <section id="screen-link">
-    <h1>Bebz TV</h1>
-    <p class="sub">Link your device first, then activate it or add a playlist.</p>
+    <h1 class="card-logo">Bebz<span>TV</span></h1>
+    <p class="small-note" style="margin-bottom:22px;">Link your device to activate it or add a playlist.</p>
 
     <label class="field-label" for="device_id_link">Device ID</label>
-    <input id="device_id_link" placeholder="Enter Device ID (e.g. AB3X9K…)" autocomplete="off" />
+    <input id="device_id_link" placeholder="Enter Device ID shown on your TV" autocomplete="off" />
 
     <button id="btnLinkDevice">Link Device</button>
 
     <div class="small-note">Type the Device ID manually, or scan the QR code shown on your TV.</div>
   </section>
 
-  <!-- ── SCREEN: Dashboard ── -->
+  <!-- SCREEN: Dashboard -->
   <section id="screen-dashboard" class="hidden">
-    <h2>Device Dashboard</h2>
+    <h2 class="card-title">Device Dashboard</h2>
 
     <div class="info-box">
       <div class="info-row">
@@ -197,13 +605,13 @@
 
     <button id="btnGoActivate">Activate / Start Trial</button>
     <button id="btnGoPlaylist" class="secondary">Add Playlist</button>
-    <hr class="divider" />
+    <hr class="divider-line" />
     <button id="btnBackToLink" class="secondary">← Back</button>
   </section>
 
-  <!-- ── SCREEN: Activate ── -->
+  <!-- SCREEN: Activate -->
   <section id="screen-activate" class="hidden">
-    <h2>Activate Device</h2>
+    <h2 class="card-title">Activate Device</h2>
 
     <div class="info-box">
       <div class="info-row">
@@ -225,13 +633,13 @@
 
     <div class="small-note" id="activateNote">
       Starting a trial sets your status to <strong>free_trial</strong> for 7 days.
-      Payment integration coming in Phase 2.
+      Payment integration coming soon.
     </div>
   </section>
 
-  <!-- ── SCREEN: Playlist ── -->
+  <!-- SCREEN: Playlist -->
   <section id="screen-playlist" class="hidden">
-    <h2>Add Playlist</h2>
+    <h2 class="card-title">Add Playlist</h2>
 
     <label class="field-label">Device ID</label>
     <input id="device_id_playlist" readonly />
@@ -239,8 +647,8 @@
     <label class="field-label" for="playlist_name">Playlist Name</label>
     <input id="playlist_name" placeholder="My Playlist (optional)" />
 
-    <label class="field-label" for="playlist_url">Portal URL</label>
-    <input id="playlist_url" placeholder="http://example.com:8080" />
+    <label class="field-label" for="playlist_url">Portal URL or M3U Link</label>
+    <input id="playlist_url" placeholder="http://example.com:8080  or  https://…/list.m3u" />
 
     <label class="field-label" for="username">Username</label>
     <input id="username" placeholder="Username" />
@@ -251,32 +659,35 @@
     <button id="btnAddPlaylist">Add Playlist</button>
     <button id="btnBackToDashboardB" class="secondary">← Back</button>
 
-    <div class="small-note">Adding a playlist does not remove existing playlists on the TV.</div>
+    <div class="small-note">Adding a playlist does not remove existing playlists on your TV.</div>
   </section>
 
   <div id="msg"></div>
 </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">Bebz<span>TV</span></div>
+  <div class="footer-links">
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms of Use</a>
+    <a href="mailto:support@bebz.tv">support@bebz.tv</a>
+  </div>
+  <div class="footer-copy">© 2026 Bebz TV. All rights reserved.</div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // ─────────────────────────────────────────────
-  // Config
-  // ─────────────────────────────────────────────
   const SUPABASE_URL = 'https://qsmuvkwhrzbydncdiphu.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_GXoX0HbGSg4njByYEmRPAw_B7sRBLDI';
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
   const TRIAL_DAYS = 7;
 
-  // ─────────────────────────────────────────────
-  // State
-  // ─────────────────────────────────────────────
   let currentDeviceId  = '';
   let currentDeviceRow = null;
 
-  // ─────────────────────────────────────────────
-  // UI helpers
-  // ─────────────────────────────────────────────
+  // ── Screens ──
   const screens = {
     link:      document.getElementById('screen-link'),
     dashboard: document.getElementById('screen-dashboard'),
@@ -288,23 +699,24 @@
     Object.values(screens).forEach(s => s.classList.add('hidden'));
     screens[name].classList.remove('hidden');
     setMsg('');
+    if (name !== 'link') {
+      document.getElementById('device-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
-  function setMsg(text, type = '') {
+  function setMsg(text, type) {
     const el = document.getElementById('msg');
     el.textContent = text || '';
-    el.className = type;
+    el.className = type || '';
   }
 
-  function setBtn(id, text, disabled = false) {
+  function setBtn(id, text, disabled) {
     const b = document.getElementById(id);
     b.textContent = text;
-    b.disabled = disabled;
+    b.disabled = !!disabled;
   }
 
-  // ─────────────────────────────────────────────
-  // Formatting
-  // ─────────────────────────────────────────────
+  // ── Formatting ──
   function formatExpiry(value) {
     if (!value) return '—';
     const d = new Date(value);
@@ -316,12 +728,11 @@
     if (!value) return null;
     const exp = new Date(value);
     if (isNaN(exp.getTime())) return null;
-    const diffMs   = exp - Date.now();
-    const diffDays = Math.ceil(diffMs / 86400000);
-    if (diffDays < 0)  return { text: 'expired',            cls: 'over' };
+    const diffDays = Math.ceil((exp - Date.now()) / 86400000);
+    if (diffDays < 0)   return { text: 'expired',           cls: 'over' };
     if (diffDays === 0) return { text: 'expires today',     cls: 'warn' };
-    if (diffDays <= 3)  return { text: `${diffDays}d left`, cls: 'warn' };
-    return                     { text: `${diffDays}d left`, cls: '' };
+    if (diffDays <= 3)  return { text: diffDays + 'd left', cls: 'warn' };
+    return                     { text: diffDays + 'd left', cls: '' };
   }
 
   function applyStatusPill(el, status) {
@@ -329,15 +740,12 @@
     el.textContent = (status || 'inactive').replace('_', ' ');
   }
 
-  // ─────────────────────────────────────────────
-  // Dashboard population
-  // ─────────────────────────────────────────────
+  // ── Dashboard ──
   function populateDashboard(row) {
     const id     = row.device_id   || '';
     const status = row.status      || 'inactive';
     const expiry = row.expiry_date || null;
 
-    // Dashboard screen
     document.getElementById('dashDeviceId').textContent = id;
     applyStatusPill(document.getElementById('dashStatus'), status);
     document.getElementById('dashExpiry').textContent = formatExpiry(expiry);
@@ -352,62 +760,33 @@
       noteEl.classList.add('hidden');
     }
 
-    // Activate screen mirrors
     document.getElementById('activateDeviceId').textContent = id;
     applyStatusPill(document.getElementById('activateStatus'), status);
     document.getElementById('activateExpiry').textContent = formatExpiry(expiry);
-
-    // Playlist screen device id
     document.getElementById('device_id_playlist').value = id;
 
-    // Update activate button label based on current status
     const alreadyActive = (status === 'active' || status === 'free_trial');
     const btnAct = document.getElementById('btnActivateNow');
-    if (alreadyActive) {
-      btnAct.textContent = 'Already Active';
-      btnAct.disabled    = true;
-    } else {
-      btnAct.textContent = 'Start 7-Day Free Trial';
-      btnAct.disabled    = false;
-    }
+    btnAct.textContent = alreadyActive ? 'Already Active' : 'Start 7-Day Free Trial';
+    btnAct.disabled    = alreadyActive;
   }
 
-  // ─────────────────────────────────────────────
-  // Supabase helpers
-  // ─────────────────────────────────────────────
-  function normalizeDeviceId(v) {
-    return (v || '').trim().toUpperCase();
-  }
-
-  function getQueryParam(name) {
-    return new URLSearchParams(window.location.search).get(name) || '';
-  }
+  // ── Helpers ──
+  function normalizeDeviceId(v) { return (v || '').trim().toUpperCase(); }
+  function getQueryParam(name) { return new URLSearchParams(window.location.search).get(name) || ''; }
 
   async function getOrCreateDevice(deviceId) {
-    const { data, error } = await sb
-      .from('devices')
-      .select('*')
-      .eq('device_id', deviceId)
-      .limit(1);
+    const r1 = await sb.from('devices').select('*').eq('device_id', deviceId).limit(1);
+    if (r1.error) throw new Error(r1.error.message);
+    if (r1.data && r1.data.length > 0) return r1.data[0];
 
-    if (error) throw new Error(error.message);
-
-    if (data && data.length > 0) return data[0];
-
-    // New device — insert as inactive (activation is a separate step)
-    const { data: inserted, error: insertErr } = await sb
-      .from('devices')
-      .insert([{ device_id: deviceId, status: 'inactive' }])
-      .select();
-
-    if (insertErr) throw new Error(insertErr.message);
-    if (!inserted || inserted.length === 0) throw new Error('Could not create device record.');
-    return inserted[0];
+    const r2 = await sb.from('devices').insert([{ device_id: deviceId, status: 'inactive' }]).select();
+    if (r2.error) throw new Error(r2.error.message);
+    if (!r2.data || r2.data.length === 0) throw new Error('Could not create device record.');
+    return r2.data[0];
   }
 
-  // ─────────────────────────────────────────────
-  // Link device
-  // ─────────────────────────────────────────────
+  // ── Link Device ──
   async function linkDevice() {
     const id = normalizeDeviceId(document.getElementById('device_id_link').value);
     if (!id) { setMsg('Please enter a Device ID.', 'error'); return; }
@@ -428,13 +807,11 @@
     }
   }
 
-  // ─────────────────────────────────────────────
-  // Activate — grant free trial
-  // ─────────────────────────────────────────────
+  // ── Activate ──
   async function activateDevice() {
     if (!currentDeviceId) { setMsg('No device linked.', 'error'); return; }
 
-    const status = currentDeviceRow?.status || 'inactive';
+    const status = (currentDeviceRow && currentDeviceRow.status) ? currentDeviceRow.status : 'inactive';
     if (status === 'active' || status === 'free_trial') {
       setMsg('This device is already active.', 'success');
       return;
@@ -443,170 +820,116 @@
     setBtn('btnActivateNow', 'Activating…', true);
     setMsg('Granting free trial…');
 
-    // expiry = today + TRIAL_DAYS
     const expiry = new Date();
     expiry.setDate(expiry.getDate() + TRIAL_DAYS);
-    const expiryIso = expiry.toISOString().split('T')[0]; // YYYY-MM-DD
+    const expiryIso = expiry.toISOString().split('T')[0];
 
     try {
-      const { data, error } = await sb
-        .from('devices')
-        .update({ status: 'free_trial', expiry_date: expiryIso })
-        .eq('device_id', currentDeviceId)
-        .select();
+      const r = await sb.from('devices').update({ status: 'free_trial', expiry_date: expiryIso }).eq('device_id', currentDeviceId).select();
+      if (r.error) throw new Error(r.error.message);
 
-      if (error) throw new Error(error.message);
-
-      const updated = data && data.length > 0 ? data[0] : { ...currentDeviceRow, status: 'free_trial', expiry_date: expiryIso };
+      const updated = (r.data && r.data.length > 0) ? r.data[0] : Object.assign({}, currentDeviceRow, { status: 'free_trial', expiry_date: expiryIso });
       currentDeviceRow = updated;
       populateDashboard(updated);
-      setMsg(`✓ Free trial activated! Expires ${formatExpiry(expiryIso)}.`, 'success');
+      setMsg('✓ Free trial activated! Expires ' + formatExpiry(expiryIso) + '.', 'success');
 
-      // Reflect on activate screen
       document.getElementById('activateNote').innerHTML =
-        `✓ Trial active until <strong>${formatExpiry(expiryIso)}</strong>. Return to your TV — it will detect the activation automatically.`;
-
+        '✓ Trial active until <strong>' + formatExpiry(expiryIso) + '</strong>. Return to your TV — it will detect the activation automatically.';
     } catch (err) {
       setMsg('Error: ' + err.message, 'error');
       setBtn('btnActivateNow', 'Start 7-Day Free Trial', false);
     }
   }
 
-  // ─────────────────────────────────────────────
-  // Auto-delete timer for unclaimed playlist rows
-  // ─────────────────────────────────────────────
-  const TRANSMISSION_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
-  const PICKUP_POLL_MS = 3000; // check every 3 seconds
-  let transmissionTimer   = null;
-  let pendingLinkId       = null;
-  let countdownInterval   = null;
-  let pickupPollInterval  = null;
+  // ── Transmission Timer ──
+  const TRANSMISSION_TIMEOUT_MS = 2 * 60 * 1000;
+  const PICKUP_POLL_MS = 3000;
+  let transmissionTimer  = null;
+  let pendingLinkId      = null;
+  let countdownInterval  = null;
+  let pickupPollInterval = null;
 
   function startTransmissionTimer(linkId) {
     pendingLinkId = linkId;
-
-    // Countdown display
     let secondsLeft = TRANSMISSION_TIMEOUT_MS / 1000;
     updateCountdownMsg(secondsLeft);
 
-    // Every second: tick the countdown
-    countdownInterval = setInterval(() => {
+    countdownInterval = setInterval(function() {
       secondsLeft -= 1;
-      if (secondsLeft > 0) {
-        updateCountdownMsg(secondsLeft);
-      }
+      if (secondsLeft > 0) updateCountdownMsg(secondsLeft);
     }, 1000);
 
-    // Every 3 seconds: check if Roku already deleted the row
-    pickupPollInterval = setInterval(async () => {
+    pickupPollInterval = setInterval(async function() {
       if (!pendingLinkId) return;
-      const { data } = await sb
-        .from('device_links')
-        .select('id')
-        .eq('id', Number(pendingLinkId))
-        .limit(1);
-      if (!data || data.length === 0) {
-        // Row is gone — Roku picked it up successfully
+      const r = await sb.from('device_links').select('id').eq('id', Number(pendingLinkId)).limit(1);
+      if (!r.data || r.data.length === 0) {
         cancelTransmissionTimer();
         setMsg('✓ Playlist received by your TV!', 'success');
         setBtn('btnAddPlaylist', 'Add Playlist', false);
       }
     }, PICKUP_POLL_MS);
 
-    // 2-minute hard deadline — row was never picked up
-    transmissionTimer = setTimeout(async () => {
-      clearInterval(countdownInterval);
-      countdownInterval = null;
-      clearInterval(pickupPollInterval);
-      pickupPollInterval = null;
-
-      // Delete the row — TV never picked it up
+    transmissionTimer = setTimeout(async function() {
+      clearInterval(countdownInterval);  countdownInterval  = null;
+      clearInterval(pickupPollInterval); pickupPollInterval = null;
       if (pendingLinkId) {
-        const { error: delErr } = await sb
-          .from('device_links')
-          .delete()
-          .eq('id', Number(pendingLinkId));
-        if (delErr) {
-          console.error('Auto-delete failed:', delErr.message);
-        }
+        await sb.from('device_links').delete().eq('id', Number(pendingLinkId));
         pendingLinkId = null;
       }
-
-      setMsg('Transmission failed — TV did not respond. Please make sure your TV is on and the app is open, then try again.', 'error');
+      setMsg('Transmission failed — TV did not respond. Make sure your TV is on and the app is open, then try again.', 'error');
       setBtn('btnAddPlaylist', 'Add Playlist', false);
     }, TRANSMISSION_TIMEOUT_MS);
   }
 
   function cancelTransmissionTimer() {
-    if (transmissionTimer)   { clearTimeout(transmissionTimer);    transmissionTimer   = null; }
-    if (countdownInterval)   { clearInterval(countdownInterval);   countdownInterval   = null; }
-    if (pickupPollInterval)  { clearInterval(pickupPollInterval);  pickupPollInterval  = null; }
+    if (transmissionTimer)  { clearTimeout(transmissionTimer);   transmissionTimer  = null; }
+    if (countdownInterval)  { clearInterval(countdownInterval);  countdownInterval  = null; }
+    if (pickupPollInterval) { clearInterval(pickupPollInterval); pickupPollInterval = null; }
     pendingLinkId = null;
   }
 
   function updateCountdownMsg(secondsLeft) {
     const m = Math.floor(secondsLeft / 60);
     const s = secondsLeft % 60;
-    const timeStr = m > 0 ? `${m}m ${s}s` : `${s}s`;
-    setMsg(`✓ Playlist sent! Waiting for your TV to pick it up… (${timeStr})`, 'success');
+    setMsg('✓ Playlist sent! Waiting for your TV… (' + (m > 0 ? m + 'm ' : '') + s + 's)', 'success');
   }
 
-  // ─────────────────────────────────────────────
-  // Add playlist
-  // ─────────────────────────────────────────────
+  // ── Add Playlist ──
   async function addPlaylist() {
+    const url      = document.getElementById('playlist_url').value.trim();
+    const name     = document.getElementById('playlist_name').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const isM3u    = url.toLowerCase().endsWith('.m3u') || url.toLowerCase().endsWith('.m3u8');
+
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); showScreen('link'); return; }
+    if (!url) { setMsg('Portal URL is required.', 'error'); return; }
+    if (!url.startsWith('http://') && !url.startsWith('https://')) { setMsg('URL must start with http:// or https://', 'error'); return; }
+    if (!isM3u && (!username || !password)) { setMsg('Portal URL, Username, and Password are required.', 'error'); return; }
+
     const payload = {
       device_id:     currentDeviceId,
-      playlist_name: document.getElementById('playlist_name').value.trim(),
-      playlist_url:  document.getElementById('playlist_url').value.trim(),
-      username:      document.getElementById('username').value.trim(),
-      password:      document.getElementById('password').value.trim(),
+      playlist_name: name || (isM3u ? 'M3U Playlist' : 'My Playlist'),
+      playlist_url:  url,
+      username:      isM3u ? '' : username,
+      password:      isM3u ? '' : password,
       consumed:      false,
     };
 
-    if (!payload.device_id) {
-      setMsg('Please link a device first.', 'error');
-      showScreen('link');
-      return;
-    }
-    const isM3u = payload.playlist_url.toLowerCase().endsWith('.m3u') || payload.playlist_url.toLowerCase().endsWith('.m3u8');
-    if (!payload.playlist_url || (!isM3u && (!payload.username || !payload.password))) {
-      setMsg('Portal URL, Username, and Password are required.', 'error');
-      return;
-    }
-    if (isM3u) { payload.username = ''; payload.password = ''; }
-    if (!payload.playlist_url.startsWith('http://') && !payload.playlist_url.startsWith('https://')) {
-      setMsg('Portal URL must start with http:// or https://', 'error');
-      return;
-    }
-
-    // Cancel any previous pending transmission
     cancelTransmissionTimer();
-
     setBtn('btnAddPlaylist', 'Sending…', true);
     setMsg('Sending to your TV…');
 
-    const { data, error } = await sb
-      .from('device_links')
-      .insert([payload])
-      .select('id');
+    const r = await sb.from('device_links').insert([payload]).select('id');
+    if (r.error) { setMsg('Error: ' + r.error.message, 'error'); setBtn('btnAddPlaylist', 'Add Playlist', false); return; }
 
-    if (error) {
-      setMsg('Error: ' + error.message, 'error');
-      setBtn('btnAddPlaylist', 'Add Playlist', false);
-      return;
-    }
-
-    // Clear the form immediately so credentials aren't visible
-    ['playlist_name','playlist_url','username','password'].forEach(id => {
+    ['playlist_name','playlist_url','username','password'].forEach(function(id) {
       document.getElementById(id).value = '';
     });
     document.getElementById('device_id_playlist').value = currentDeviceId;
 
-    const insertedId = data && data.length > 0 ? data[0].id : null;
-
+    const insertedId = (r.data && r.data.length > 0) ? r.data[0].id : null;
     if (insertedId) {
-      // Start 2-minute watchdog — deletes row if TV never picks it up
       startTransmissionTimer(insertedId);
     } else {
       setMsg('✓ Playlist sent! Your TV will load it within seconds.', 'success');
@@ -614,41 +937,31 @@
     }
   }
 
-  // ─────────────────────────────────────────────
-  // Event listeners
-  // ─────────────────────────────────────────────
+  // ── Event Listeners ──
   document.getElementById('btnLinkDevice').addEventListener('click', linkDevice);
-  document.getElementById('device_id_link').addEventListener('keydown', e => { if (e.key === 'Enter') linkDevice(); });
-
-  document.getElementById('btnGoActivate').addEventListener('click', () => {
+  document.getElementById('device_id_link').addEventListener('keydown', function(e) { if (e.key === 'Enter') linkDevice(); });
+  document.getElementById('btnGoActivate').addEventListener('click', function() {
     if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
     showScreen('activate');
   });
-
-  document.getElementById('btnGoPlaylist').addEventListener('click', () => {
+  document.getElementById('btnGoPlaylist').addEventListener('click', function() {
     if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
     showScreen('playlist');
   });
-
   document.getElementById('btnActivateNow').addEventListener('click', activateDevice);
-
   document.getElementById('btnAddPlaylist').addEventListener('click', addPlaylist);
+  document.getElementById('btnBackToLink').addEventListener('click', function() { showScreen('link'); });
+  document.getElementById('btnBackToDashboardA').addEventListener('click', function() { showScreen('dashboard'); });
+  document.getElementById('btnBackToDashboardB').addEventListener('click', function() { cancelTransmissionTimer(); showScreen('dashboard'); });
 
-  document.getElementById('btnBackToLink').addEventListener('click',       () => showScreen('link'));
-  document.getElementById('btnBackToDashboardA').addEventListener('click', () => showScreen('dashboard'));
-  document.getElementById('btnBackToDashboardB').addEventListener('click', () => {
-    cancelTransmissionTimer();
-    showScreen('dashboard');
-  });
-
-  // ─────────────────────────────────────────────
-  // Auto-fill device ID from QR code URL param
-  // ─────────────────────────────────────────────
+  // ── QR Auto-link ──
   const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
-  showScreen('link');
   if (codeFromUrl) {
     document.getElementById('device_id_link').value = codeFromUrl;
+    document.getElementById('device-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
     linkDevice();
+  } else {
+    showScreen('link');
   }
 </script>
 </body>
