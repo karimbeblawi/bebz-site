@@ -195,8 +195,7 @@
       </div>
     </div>
 
-    <button id="btnGoActivate">Start Free Trial</button>
-    <button id="btnGoSubscribe" class="secondary">Subscribe / Renew</button>
+    <button id="btnGoActivate">Activate / Start Trial</button>
     <button id="btnGoPlaylist" class="secondary">Add Playlist</button>
     <hr class="divider" />
     <button id="btnBackToLink" class="secondary">← Back</button>
@@ -221,11 +220,12 @@
       </div>
     </div>
 
-    <button id="btnActivateNow">Start 30-Day Free Trial</button>
+    <button id="btnActivateNow">Start 7-Day Free Trial</button>
     <button id="btnBackToDashboardA" class="secondary">← Back</button>
 
     <div class="small-note" id="activateNote">
-      No credit card required. After 30 days, choose a plan to keep watching.
+      Starting a trial sets your status to <strong>free_trial</strong> for 7 days.
+      Payment integration coming in Phase 2.
     </div>
   </section>
 
@@ -254,48 +254,6 @@
     <div class="small-note">Adding a playlist does not remove existing playlists on the TV.</div>
   </section>
 
-  <!-- SCREEN: Subscribe -->
-  <section id="screen-subscribe" class="hidden">
-    <h2>Choose a Plan</h2>
-
-    <div class="info-box">
-      <div class="info-row">
-        <span class="info-label">Device ID</span>
-        <span id="subscribeDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Status</span>
-        <span id="subscribeStatus" class="status-pill inactive">inactive</span>
-      </div>
-    </div>
-
-    <div id="plan-annual" onclick="selectPlan('annual')" style="background:#1c253a;border:2px solid #1e293b;border-radius:10px;padding:18px;margin-bottom:12px;cursor:pointer;transition:border-color 0.15s;">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <div style="font-weight:bold;font-size:16px;margin-bottom:4px;">Annual</div>
-          <div style="font-size:13px;color:#9ca3af;">Full access, renewed yearly</div>
-          <div style="display:inline-block;background:rgba(59,130,246,0.2);color:#60a5fa;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;margin-top:8px;">Most Popular</div>
-        </div>
-        <div style="font-size:26px;font-weight:bold;white-space:nowrap;">$8.99<span style="font-size:14px;color:#9ca3af;font-weight:400;">/yr</span></div>
-      </div>
-    </div>
-
-    <div id="plan-lifetime" onclick="selectPlan('lifetime')" style="background:#1c253a;border:2px solid #1e293b;border-radius:10px;padding:18px;margin-bottom:16px;cursor:pointer;transition:border-color 0.15s;">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <div style="font-weight:bold;font-size:16px;margin-bottom:4px;">Lifetime</div>
-          <div style="font-size:13px;color:#9ca3af;">Pay once, watch forever</div>
-        </div>
-        <div style="font-size:26px;font-weight:bold;">$19.99</div>
-      </div>
-    </div>
-
-    <button id="btnCheckout" disabled>Select a plan above</button>
-    <button id="btnBackToDashboardC" class="secondary">← Back</button>
-
-    <div class="small-note">Secure payment by Stripe. Annual plan can be cancelled anytime.</div>
-  </section>
-
   <div id="msg"></div>
 </div>
 
@@ -308,7 +266,7 @@
   const SUPABASE_KEY = 'sb_publishable_GXoX0HbGSg4njByYEmRPAw_B7sRBLDI';
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const TRIAL_DAYS = 30;
+  const TRIAL_DAYS = 7;
 
   // ─────────────────────────────────────────────
   // State
@@ -323,7 +281,6 @@
     link:      document.getElementById('screen-link'),
     dashboard: document.getElementById('screen-dashboard'),
     activate:  document.getElementById('screen-activate'),
-    subscribe: document.getElementById('screen-subscribe'),
     playlist:  document.getElementById('screen-playlist'),
   };
 
@@ -403,10 +360,6 @@
     // Playlist screen device id
     document.getElementById('device_id_playlist').value = id;
 
-    // Subscribe screen mirrors
-    document.getElementById('subscribeDeviceId').textContent = id;
-    applyStatusPill(document.getElementById('subscribeStatus'), status);
-
     // Update activate button label based on current status
     const alreadyActive = (status === 'active' || status === 'free_trial');
     const btnAct = document.getElementById('btnActivateNow');
@@ -414,7 +367,7 @@
       btnAct.textContent = 'Already Active';
       btnAct.disabled    = true;
     } else {
-      btnAct.textContent = 'Start 30-Day Free Trial';
+      btnAct.textContent = 'Start 7-Day Free Trial';
       btnAct.disabled    = false;
     }
   }
@@ -662,67 +615,38 @@
   }
 
   // ─────────────────────────────────────────────
-  // Plan selection & Stripe Checkout
+  // Event listeners
   // ─────────────────────────────────────────────
-  var selectedPlan = null;
+  document.getElementById('btnLinkDevice').addEventListener('click', linkDevice);
+  document.getElementById('device_id_link').addEventListener('keydown', e => { if (e.key === 'Enter') linkDevice(); });
 
-  function selectPlan(plan) {
-    selectedPlan = plan;
-    ['annual','lifetime'].forEach(function(p) {
-      var el = document.getElementById('plan-' + p);
-      el.style.borderColor = p === plan ? '#3b82f6' : '#1e293b';
-      el.style.background  = p === plan ? 'rgba(59,130,246,0.08)' : '#1c253a';
-    });
-    var btn = document.getElementById('btnCheckout');
-    btn.textContent = 'Continue to Payment →';
-    btn.disabled = false;
-  }
+  document.getElementById('btnGoActivate').addEventListener('click', () => {
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
+    showScreen('activate');
+  });
 
-  async function startCheckout() {
-    if (!selectedPlan) { setMsg('Please select a plan.', 'error'); return; }
-    if (!currentDeviceId) { setMsg('No device linked.', 'error'); return; }
-    var btn = document.getElementById('btnCheckout');
-    btn.textContent = 'Redirecting…';
-    btn.disabled = true;
-    setMsg('Opening secure payment…');
-    try {
-      var response = await fetch('/api/create-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ device_id: currentDeviceId, plan: selectedPlan }),
-      });
-      var data = await response.json();
-      if (data.error) throw new Error(data.error);
-      window.location.href = data.url;
-    } catch (err) {
-      setMsg('Error: ' + err.message, 'error');
-      btn.textContent = 'Continue to Payment →';
-      btn.disabled = false;
-    }
-  }
+  document.getElementById('btnGoPlaylist').addEventListener('click', () => {
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
+    showScreen('playlist');
+  });
+
+  document.getElementById('btnActivateNow').addEventListener('click', activateDevice);
+
+  document.getElementById('btnAddPlaylist').addEventListener('click', addPlaylist);
+
+  document.getElementById('btnBackToLink').addEventListener('click',       () => showScreen('link'));
+  document.getElementById('btnBackToDashboardA').addEventListener('click', () => showScreen('dashboard'));
+  document.getElementById('btnBackToDashboardB').addEventListener('click', () => {
+    cancelTransmissionTimer();
+    showScreen('dashboard');
+  });
 
   // ─────────────────────────────────────────────
-  // Startup: handle QR scan or Stripe payment return
+  // Auto-fill device ID from QR code URL param
   // ─────────────────────────────────────────────
-  const paymentReturn     = getQueryParam('payment');
-  const deviceFromPayment = normalizeDeviceId(getQueryParam('device'));
-  const planFromPayment   = getQueryParam('plan');
-  const codeFromUrl       = normalizeDeviceId(getQueryParam('code'));
-
+  const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
   showScreen('link');
-
-  if (paymentReturn && deviceFromPayment) {
-    // Returning from Stripe -- link device then show result message
-    document.getElementById('device_id_link').value = deviceFromPayment;
-    linkDevice().then(function() {
-      if (paymentReturn === 'success') {
-        setMsg('\u2713 Payment successful! Your ' + (planFromPayment === 'lifetime' ? 'lifetime' : 'annual') + ' subscription is now active. Return to your TV.', 'success');
-      } else if (paymentReturn === 'cancelled') {
-        setMsg('Payment was cancelled. You can try again anytime.', 'error');
-      }
-    });
-  } else if (codeFromUrl) {
-    // QR code scan
+  if (codeFromUrl) {
     document.getElementById('device_id_link').value = codeFromUrl;
     linkDevice();
   }
