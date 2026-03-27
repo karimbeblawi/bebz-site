@@ -1,4 +1,3 @@
-// api/webhook.js
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
 
@@ -7,6 +6,7 @@ const sb = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
+// Disable body parsing so Stripe can verify the raw body signature
 module.exports.config = {
   api: { bodyParser: false },
 };
@@ -20,7 +20,8 @@ function getRawBody(req) {
   });
 }
 
-module.exports.default = async function(req, res) {
+// Direct export -- NOT module.exports.default
+module.exports = async function(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   var rawBody = await getRawBody(req);
@@ -58,7 +59,7 @@ module.exports.default = async function(req, res) {
       }).eq('device_id', deviceId);
 
       if (r.error) console.error('Supabase error:', r.error.message);
-      else console.log('Activated device:', deviceId, 'plan:', plan);
+      else console.log('Activated device:', deviceId, 'plan:', plan, 'expiry:', expiryDate);
 
     } else if (event.type === 'customer.subscription.deleted' || event.type === 'invoice.payment_failed') {
       var customerId = event.data.object.customer;
