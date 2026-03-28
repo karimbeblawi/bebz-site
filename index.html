@@ -40,16 +40,13 @@
       position: fixed;
       inset: 0;
       background-image: url("background1.jpg");
-      background-repeat: no-repeat; /* Prevents the image from repeating */
-      background-size: cover;      /* Scales the image to cover the entire element */
-      background-attachment: fixed; /* Fixes the image position during scrolling */
-      background-color: #cccccc;  /* Fallback color if the image can't load */      
-
-
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-attachment: fixed;
+      background-color: #cccccc;
       pointer-events: none;
       z-index: 0;
     }
-
 
     /* ── GLOW ORBS ── */
     .orb {
@@ -458,7 +455,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: gap;
+      flex-wrap: wrap;
       gap: 16px;
     }
 
@@ -643,8 +640,7 @@
     <button id="btnBackToDashboardA" class="secondary">← Back</button>
 
     <div class="small-note" id="activateNote">
-      Starting a trial sets your status to <strong>free_trial</strong> for 7 days.
-      Payment integration coming soon.
+      Starting a trial gives you full access for 30 days. No credit card required.
     </div>
   </section>
 
@@ -717,7 +713,6 @@
   const SUPABASE_URL = 'https://qsmuvkwhrzbydncdiphu.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_GXoX0HbGSg4njByYEmRPAw_B7sRBLDI';
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  const TRIAL_DAYS = 30;
 
   let currentDeviceId  = '';
   let currentDeviceRow = null;
@@ -853,7 +848,7 @@
     }
   }
 
-  // ── Activate ──
+  // ── Activate (server-side) ──
   async function activateDevice() {
     if (!currentDeviceId) { setMsg('No device linked.', 'error'); return; }
 
@@ -866,15 +861,17 @@
     setBtn('btnActivateNow', 'Activating…', true);
     setMsg('Granting free trial…');
 
-    const expiry = new Date();
-    expiry.setDate(expiry.getDate() + TRIAL_DAYS);
-    const expiryIso = expiry.toISOString().split('T')[0];
-
     try {
-      const r = await sb.from('devices').update({ status: 'free_trial', expiry_date: expiryIso }).eq('device_id', currentDeviceId).select();
-      if (r.error) throw new Error(r.error.message);
+      const resp = await fetch('/api/activate-trial', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id: currentDeviceId }),
+      });
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
 
-      const updated = (r.data && r.data.length > 0) ? r.data[0] : Object.assign({}, currentDeviceRow, { status: 'free_trial', expiry_date: expiryIso });
+      const expiryIso = data.expiry_date;
+      const updated = Object.assign({}, currentDeviceRow, { status: 'free_trial', expiry_date: expiryIso });
       currentDeviceRow = updated;
       populateDashboard(updated);
       setMsg('✓ Free trial activated! Expires ' + formatExpiry(expiryIso) + '.', 'success');
@@ -883,7 +880,7 @@
         '✓ Trial active until <strong>' + formatExpiry(expiryIso) + '</strong>. Return to your TV — it will detect the activation automatically.';
     } catch (err) {
       setMsg('Error: ' + err.message, 'error');
-      setBtn('btnActivateNow', 'Start 7-Day Free Trial', false);
+      setBtn('btnActivateNow', 'Start 30-Day Free Trial', false);
     }
   }
 
@@ -953,6 +950,9 @@
     if (!url.startsWith('http://') && !url.startsWith('https://')) { setMsg('URL must start with http:// or https://', 'error'); return; }
     if (!isM3u && (!username || !password)) { setMsg('Portal URL, Username, and Password are required.', 'error'); return; }
 
+    const expires = new Date();
+    expires.setMinutes(expires.getMinutes() + 10);
+
     const payload = {
       device_id:     currentDeviceId,
       playlist_name: name || (isM3u ? 'M3U Playlist' : 'My Playlist'),
@@ -960,6 +960,7 @@
       username:      isM3u ? '' : username,
       password:      isM3u ? '' : password,
       consumed:      false,
+      expires_at:    expires.toISOString(),
     };
 
     cancelTransmissionTimer();
