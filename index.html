@@ -929,6 +929,8 @@
     if (countdownInterval)  { clearInterval(countdownInterval);  countdownInterval  = null; }
     if (pickupPollInterval) { clearInterval(pickupPollInterval); pickupPollInterval = null; }
     pendingLinkId = null;
+    setBtn('btnAddPlaylist', 'Add Playlist', false);
+    setMsg('');
   }
 
   function updateCountdownMsg(secondsLeft) {
@@ -1038,6 +1040,7 @@
   });
   document.getElementById('btnGoPlaylist').addEventListener('click', function() {
     if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
+    cancelTransmissionTimer();
     showScreen('playlist');
   });
   document.getElementById('btnActivateNow').addEventListener('click', activateDevice);
