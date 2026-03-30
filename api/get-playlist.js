@@ -70,9 +70,11 @@ export default async function handler(req, res) {
 
   const link = data[0];
 
-  // Decrypt credentials server-side
-  link.username = decrypt(link.username);
-  link.password = decrypt(link.password);
+  // Decrypt all fields server-side
+  link.playlist_name = decrypt(link.playlist_name);
+  link.playlist_url  = decrypt(link.playlist_url);
+  link.username      = decrypt(link.username);
+  link.password      = decrypt(link.password);
 
   return res.status(200).json({ found: true, link });
 }
