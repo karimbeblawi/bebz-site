@@ -52,12 +52,15 @@ export default async function handler(req, res) {
   const expires = new Date();
   expires.setMinutes(expires.getMinutes() + 10);
 
+  const isM3u = playlist_url.toLowerCase().endsWith('.m3u') || playlist_url.toLowerCase().endsWith('.m3u8');
+  const resolvedName = playlist_name || (isM3u ? 'M3U Playlist' : 'My Playlist');
+
   const payload = {
     device_id,
-    playlist_name: playlist_name || (playlist_url.endsWith('.m3u') || playlist_url.endsWith('.m3u8') ? 'M3U Playlist' : 'My Playlist'),
-    playlist_url,
-    username: encrypt(username),
-    password: encrypt(password),
+    playlist_name: encrypt(resolvedName),
+    playlist_url:  encrypt(playlist_url),
+    username:      encrypt(username),
+    password:      encrypt(password),
     consumed: false,
     expires_at: expires.toISOString()
   };
