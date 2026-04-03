@@ -3,7 +3,9 @@
 // Creates a PayPal order and returns the approval URL.
 // =============================================================
 
-const PLAN_CONFIG = {
+var fetch = require('node-fetch');
+
+var PLAN_CONFIG = {
   annual: {
     name: 'BebzTV Annual Subscription',
     description: 'Full access to BebzTV media player for 1 year',
@@ -19,14 +21,14 @@ const PLAN_CONFIG = {
 };
 
 async function getPayPalAccessToken() {
-  const clientId = process.env.PAYPAL_CLIENT_ID;
-  const secret   = process.env.PAYPAL_SECRET_KEY;
-  const mode     = process.env.PAYPAL_MODE || 'live';
-  const baseUrl  = mode === 'sandbox'
+  var clientId = process.env.PAYPAL_CLIENT_ID;
+  var secret   = process.env.PAYPAL_SECRET_KEY;
+  var mode     = process.env.PAYPAL_MODE || 'live';
+  var baseUrl  = mode === 'sandbox'
     ? 'https://api-m.sandbox.paypal.com'
     : 'https://api-m.paypal.com';
 
-  const resp = await fetch(`${baseUrl}/v1/oauth2/token`, {
+  var resp = await fetch(baseUrl + '/v1/oauth2/token', {
     method: 'POST',
     headers: {
       'Authorization': 'Basic ' + Buffer.from(clientId + ':' + secret).toString('base64'),
@@ -35,9 +37,9 @@ async function getPayPalAccessToken() {
     body: 'grant_type=client_credentials'
   });
 
-  const data = await resp.json();
-  if (!data.access_token) throw new Error('Failed to get PayPal access token');
-  return { token: data.access_token, baseUrl };
+  var data = await resp.json();
+  if (!data.access_token) throw new Error('Failed to get PayPal access token: ' + JSON.stringify(data));
+  return { token: data.access_token, baseUrl: baseUrl };
 }
 
 module.exports = async function(req, res) {
@@ -45,24 +47,25 @@ module.exports = async function(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { device_id, plan } = req.body;
+  var device_id = req.body.device_id;
+  var plan      = req.body.plan;
 
   if (!device_id || !plan) {
     return res.status(400).json({ error: 'Missing device_id or plan' });
   }
 
-  const planConfig = PLAN_CONFIG[plan];
+  var planConfig = PLAN_CONFIG[plan];
   if (!planConfig) {
     return res.status(400).json({ error: 'Invalid plan' });
   }
 
   try {
-    const { token, baseUrl } = await getPayPalAccessToken();
+    var auth = await getPayPalAccessToken();
 
-    const orderResp = await fetch(`${baseUrl}/v2/checkout/orders`, {
+    var orderResp = await fetch(auth.baseUrl + '/v2/checkout/orders', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': 'Bearer ' + auth.token,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -71,7 +74,7 @@ module.exports = async function(req, res) {
           {
             reference_id: device_id + '_' + plan,
             description: planConfig.description,
-            custom_id: JSON.stringify({ device_id, plan }),
+            custom_id: JSON.stringify({ device_id: device_id, plan: plan }),
             amount: {
               currency_code: planConfig.currency,
               value: planConfig.amount
@@ -100,22 +103,22 @@ module.exports = async function(req, res) {
       })
     });
 
-    const order = await orderResp.json();
+    var order = await orderResp.json();
 
     if (!order.id) {
       console.error('PayPal order error:', JSON.stringify(order));
-      return res.status(500).json({ error: 'Failed to create PayPal order' });
+      return res.status(500).json({ error: 'Failed to create PayPal order', detail: JSON.stringify(order) });
     }
 
-    const approvalLink = order.links.find(function(l) { return l.rel === 'approve'; });
+    var approvalLink = order.links.find(function(l) { return l.rel === 'approve'; });
     if (!approvalLink) {
       return res.status(500).json({ error: 'No approval URL from PayPal' });
     }
 
     return res.status(200).json({ url: approvalLink.href });
 
-  } catch (err) {
-    console.error('PayPal error:', err);
-    return res.status(500).json({ error: 'Failed to create checkout session' });
+  } catch(err) {
+    console.error('PayPal error:', err.message);
+    return res.status(500).json({ error: 'Failed to create checkout session', detail: err.message });
   }
 };
