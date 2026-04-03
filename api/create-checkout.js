@@ -10,7 +10,7 @@ var PLAN_CONFIG = {
   lifetime: {
     name: 'BebzTV Lifetime Access',
     description: 'Permanent access to BebzTV media player — one-time payment',
-    amount: '0.01',
+    amount: '19.99',
     currency: 'USD'
   }
 };
