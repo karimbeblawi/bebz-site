@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Bebz TV</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#080e1a;--bg2:#0d1528;--card:#111827;--border:#1e2d45;--accent:#3b82f6;--accent2:#60a5fa;--text:#f0f4ff;--muted:#8494b0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid rgba(255,255,255,0.05)}
+    .nav-logo{font-family:'DM Sans',sans-serif;font-weight:800;font-size:20px;color:var(--text);text-decoration:none}
+    .nav-logo span{color:var(--accent2)}
+    .nav-links{display:flex;gap:24px;list-style:none}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s}
+    .nav-links a:hover{color:var(--text)}
+    .hero{max-width:900px;margin:0 auto;padding:80px 24px 60px;text-align:center}
+    .hero h1{font-family:'DM Sans',sans-serif;font-size:clamp(36px,6vw,60px);font-weight:800;line-height:1.1;letter-spacing:-1px;margin-bottom:20px}
+    .hero h1 span{background:linear-gradient(135deg,var(--accent2),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero p{font-size:17px;color:var(--muted);max-width:580px;margin:0 auto;line-height:1.7}
+    .cards{max-width:900px;margin:0 auto;padding:20px 24px 80px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px}
+    .card-icon{font-size:28px;margin-bottom:14px}
+    .card h3{font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px}
+    .card p{font-size:14px;color:var(--muted);margin:0;line-height:1.6}
+    .disclaimer{max-width:740px;margin:0 auto 60px;padding:0 24px}
+    .disclaimer-box{background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:14px;padding:28px 32px}
+    .disclaimer-box h2{font-family:'DM Sans',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px;color:var(--accent2)}
+    .disclaimer-box p{font-size:15px;color:#c9d3e8;margin-bottom:8px}
+    .disclaimer-box p:last-child{margin:0}
+    footer{border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    .footer-links{display:flex;gap:16px;flex-wrap:wrap}
+    .footer-links a{color:var(--muted);font-size:13px;text-decoration:none}
+    .footer-links a:hover{color:var(--text)}
+    .footer-copy{color:var(--muted);font-size:12px}
+    @media(max-width:600px){nav{padding:16px 20px}.nav-links{display:none}footer{flex-direction:column;text-align:center}}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Bebz<span>TV</span></a>
+  <ul class="nav-links">
+    <li><a href="/#features">Features</a></li>
+    <li><a href="/#pricing">Pricing</a></li>
+    <li><a href="/about.html">About</a></li>
+    <li><a href="/contact.html">Contact</a></li>
+    <li><a href="mailto:support@bebz.tv">Support</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <h1>Built for people who<br><span>love great TV.</span></h1>
+  <p>BebzTV is an independent media player app for Roku, built by a small team passionate about beautiful, fast, and reliable software.</p>
+</div>
+
+<div class="cards">
+  <div class="card">
+    <div class="card-icon">🎯</div>
+    <h3>Our Mission</h3>
+    <p>To build the most elegant and reliable media player experience on Roku — fast, intuitive, and accessible to everyone including Arabic-speaking audiences.</p>
+  </div>
+  <div class="card">
+    <div class="card-icon">🛡️</div>
+    <h3>What We Are</h3>
+    <p>BebzTV is a software application only. We do not provide, host, sell, or distribute any media content. Users connect their own personal media subscriptions.</p>
+  </div>
+  <div class="card">
+    <div class="card-icon">🌍</div>
+    <h3>Where We Are</h3>
+    <p>BebzTV is based in Montreal, Canada. We are an independent software company committed to quality and customer satisfaction.</p>
+  </div>
+  <div class="card">
+    <div class="card-icon">💬</div>
+    <h3>Support</h3>
+    <p>We respond to all support requests within 24 hours. Reach us at <a href="mailto:support@bebz.tv">support@bebz.tv</a> or via our <a href="/contact.html">contact form</a>.</p>
+  </div>
+</div>
+
+<div class="disclaimer">
+  <div class="disclaimer-box">
+    <h2>Important Notice</h2>
+    <p>BebzTV is a media player application. We do not provide any video content, live channels, movies, or series. All media is sourced entirely by the user through their own third-party subscriptions.</p>
+    <p>Users are solely responsible for ensuring that the content they access is legally licensed in their region. BebzTV does not condone or facilitate access to unlicensed content.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms of Use</a>
+    <a href="/terms-of-sale.html">Terms of Sale</a>
+    <a href="/refund.html">Refund Policy</a>
+    <a href="/about.html">About</a>
+    <a href="/contact.html">Contact</a>
+    <a href="mailto:support@bebz.tv">support@bebz.tv</a>
+  </div>
+  <div class="footer-copy">© 2026 Bebz TV. All rights reserved.</div>
+</footer>
+</body>
+</html>
