@@ -1,3 +1,5 @@
+var fetch = require('node-fetch');
+
 // =============================================================
 // api/paypal-capture.js
 // Captures PayPal payment after customer approves and
