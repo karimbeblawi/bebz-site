@@ -1183,7 +1183,7 @@
 
   // ── Startup ──
   const paymentReturn = getQueryParam('payment');
-  const deviceFromPayment = normalizeDeviceId(getQueryParam('device'));
+  const deviceFromPayment = normalizeDeviceId(getQueryParam('device_id') || getQueryParam('device'));
   const planFromPayment = getQueryParam('plan');
   const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
   showScreen('link');
