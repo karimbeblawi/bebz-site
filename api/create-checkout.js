@@ -4,7 +4,7 @@ var PLAN_CONFIG = {
   annual: {
     name: 'BebzTV Annual Subscription',
     description: 'Full access to BebzTV media player for 1 year',
-    amount: '8.99',
+    amount: '0.01',
     currency: 'USD'
   },
   lifetime: {
