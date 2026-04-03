@@ -1,8 +1,3 @@
-// =============================================================
-// api/create-checkout.js
-// Creates a PayPal order and returns the approval URL.
-// =============================================================
-
 var fetch = require('node-fetch');
 
 var PLAN_CONFIG = {
@@ -20,28 +15,6 @@ var PLAN_CONFIG = {
   }
 };
 
-async function getPayPalAccessToken() {
-  var clientId = process.env.PAYPAL_CLIENT_ID;
-  var secret   = process.env.PAYPAL_SECRET_KEY;
-  var mode     = process.env.PAYPAL_MODE || 'live';
-  var baseUrl  = mode === 'sandbox'
-    ? 'https://api-m.sandbox.paypal.com'
-    : 'https://api-m.paypal.com';
-
-  var resp = await fetch(baseUrl + '/v1/oauth2/token', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Basic ' + Buffer.from(clientId + ':' + secret).toString('base64'),
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: 'grant_type=client_credentials'
-  });
-
-  var data = await resp.json();
-  if (!data.access_token) throw new Error('Failed to get PayPal access token: ' + JSON.stringify(data));
-  return { token: data.access_token, baseUrl: baseUrl };
-}
-
 module.exports = async function(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -49,6 +22,12 @@ module.exports = async function(req, res) {
 
   var device_id = req.body.device_id;
   var plan      = req.body.plan;
+
+  console.log('create-checkout called: device_id=' + device_id + ' plan=' + plan);
+  console.log('ENV CHECK: PAYPAL_CLIENT_ID=' + (process.env.PAYPAL_CLIENT_ID ? 'SET' : 'MISSING'));
+  console.log('ENV CHECK: PAYPAL_SECRET_KEY=' + (process.env.PAYPAL_SECRET_KEY ? 'SET' : 'MISSING'));
+  console.log('ENV CHECK: PAYPAL_MODE=' + process.env.PAYPAL_MODE);
+  console.log('ENV CHECK: SITE_URL=' + process.env.SITE_URL);
 
   if (!device_id || !plan) {
     return res.status(400).json({ error: 'Missing device_id or plan' });
@@ -59,40 +38,63 @@ module.exports = async function(req, res) {
     return res.status(400).json({ error: 'Invalid plan' });
   }
 
-  try {
-    var auth = await getPayPalAccessToken();
+  var clientId = process.env.PAYPAL_CLIENT_ID;
+  var secret   = process.env.PAYPAL_SECRET_KEY;
+  var mode     = process.env.PAYPAL_MODE || 'live';
+  var baseUrl  = mode === 'sandbox'
+    ? 'https://api-m.sandbox.paypal.com'
+    : 'https://api-m.paypal.com';
 
-    var orderResp = await fetch(auth.baseUrl + '/v2/checkout/orders', {
+  try {
+    // Step 1: Get access token
+    console.log('Getting PayPal access token from ' + baseUrl);
+    var tokenResp = await fetch(baseUrl + '/v1/oauth2/token', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + auth.token,
+        'Authorization': 'Basic ' + Buffer.from(clientId + ':' + secret).toString('base64'),
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'grant_type=client_credentials'
+    });
+
+    var tokenData = await tokenResp.json();
+    console.log('Token response status: ' + tokenResp.status);
+
+    if (!tokenData.access_token) {
+      console.error('Token error:', JSON.stringify(tokenData));
+      return res.status(500).json({ error: 'PayPal auth failed', detail: JSON.stringify(tokenData) });
+    }
+
+    console.log('Got access token OK');
+
+    // Step 2: Create order
+    var orderResp = await fetch(baseUrl + '/v2/checkout/orders', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + tokenData.access_token,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         intent: 'CAPTURE',
-        purchase_units: [
-          {
-            reference_id: device_id + '_' + plan,
+        purchase_units: [{
+          reference_id: device_id + '_' + plan,
+          description: planConfig.description,
+          custom_id: JSON.stringify({ device_id: device_id, plan: plan }),
+          amount: {
+            currency_code: planConfig.currency,
+            value: planConfig.amount
+          },
+          items: [{
+            name: planConfig.name,
             description: planConfig.description,
-            custom_id: JSON.stringify({ device_id: device_id, plan: plan }),
-            amount: {
+            quantity: '1',
+            unit_amount: {
               currency_code: planConfig.currency,
               value: planConfig.amount
             },
-            items: [
-              {
-                name: planConfig.name,
-                description: planConfig.description,
-                quantity: '1',
-                unit_amount: {
-                  currency_code: planConfig.currency,
-                  value: planConfig.amount
-                },
-                category: 'DIGITAL_GOODS'
-              }
-            ]
-          }
-        ],
+            category: 'DIGITAL_GOODS'
+          }]
+        }],
         application_context: {
           brand_name: 'BebzTV',
           landing_page: 'NO_PREFERENCE',
@@ -104,9 +106,10 @@ module.exports = async function(req, res) {
     });
 
     var order = await orderResp.json();
+    console.log('Order response status: ' + orderResp.status);
+    console.log('Order response: ' + JSON.stringify(order).substring(0, 200));
 
     if (!order.id) {
-      console.error('PayPal order error:', JSON.stringify(order));
       return res.status(500).json({ error: 'Failed to create PayPal order', detail: JSON.stringify(order) });
     }
 
@@ -118,7 +121,7 @@ module.exports = async function(req, res) {
     return res.status(200).json({ url: approvalLink.href });
 
   } catch(err) {
-    console.error('PayPal error:', err.message);
+    console.error('Exception:', err.message);
     return res.status(500).json({ error: 'Failed to create checkout session', detail: err.message });
   }
 };
