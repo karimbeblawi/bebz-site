@@ -82,7 +82,13 @@ module.exports = async function(req, res) {
           custom_id: JSON.stringify({ device_id: device_id, plan: plan }),
           amount: {
             currency_code: planConfig.currency,
-            value: planConfig.amount
+            value: planConfig.amount,
+            breakdown: {
+              item_total: {
+                currency_code: planConfig.currency,
+                value: planConfig.amount
+              }
+            }
           },
           items: [{
             name: planConfig.name,
