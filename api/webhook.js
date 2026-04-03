@@ -1,3 +1,5 @@
+var fetch = require('node-fetch');
+
 // =============================================================
 // api/webhook.js
 // Handles PayPal webhook events for subscription management.
