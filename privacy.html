@@ -4,28 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Privacy Policy — Bebz TV</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1220;
-      color: #d1d5db;
-      padding: 40px 20px;
-      line-height: 1.7;
-    }
-    .container {
-      max-width: 720px;
-      margin: 0 auto;
-    }
-    h1 { color: #ffffff; font-size: 28px; margin-bottom: 6px; }
-    h2 { color: #ffffff; font-size: 18px; margin-top: 32px; }
-    p, li { font-size: 15px; }
-    a { color: #60a5fa; }
-    .updated { color: #6b7280; font-size: 13px; margin-bottom: 32px; }
-    ul { padding-left: 20px; }
+    *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
+    :root{{--bg:#080e1a;--bg2:#0d1528;--card:#111827;--border:#1e2d45;--accent:#3b82f6;--accent2:#60a5fa;--text:#f0f4ff;--muted:#8494b0}}
+    body{{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh}}
+    nav{{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid rgba(255,255,255,0.05)}}
+    .nav-logo{{font-family:'DM Sans',sans-serif;font-weight:800;font-size:20px;color:var(--text);text-decoration:none}}
+    .nav-logo span{{color:var(--accent2)}}
+    .nav-links{{display:flex;gap:24px;list-style:none}}
+    .nav-links a{{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s}}
+    .nav-links a:hover{{color:var(--text)}}
+    .container{{max-width:740px;margin:0 auto;padding:60px 24px 100px}}
+    h1{{font-family:'DM Sans',sans-serif;font-size:34px;font-weight:800;margin-bottom:8px}}
+    .updated{{color:var(--muted);font-size:13px;margin-bottom:40px;display:block}}
+    h2{{font-family:'DM Sans',sans-serif;font-size:17px;font-weight:700;margin-top:36px;margin-bottom:10px;color:var(--accent2)}}
+    p,li{{font-size:15px;color:#c9d3e8;margin-bottom:10px}}
+    ul{{padding-left:20px;margin-bottom:10px}}
+    a{{color:var(--accent2)}}
+    footer{{border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}}
+    .footer-links{{display:flex;gap:16px;flex-wrap:wrap}}
+    .footer-links a{{color:var(--muted);font-size:13px;text-decoration:none}}
+    .footer-links a:hover{{color:var(--text)}}
+    .footer-copy{{color:var(--muted);font-size:12px}}
+    @media(max-width:600px){{nav{{padding:16px 20px}}.nav-links{{display:none}}footer{{flex-direction:column;text-align:center}}}}
   </style>
 </head>
 <body>
+<nav>
+  <a href="/" class="nav-logo">Bebz<span>TV</span></a>
+  <ul class="nav-links">
+    <li><a href="/#features">Features</a></li>
+    <li><a href="/#pricing">Pricing</a></li>
+    <li><a href="/about.html">About</a></li>
+    <li><a href="/contact.html">Contact</a></li>
+    <li><a href="mailto:support@bebz.tv">Support</a></li>
+  </ul>
+</nav>
 <div class="container">
 
   <h1>Privacy Policy</h1>
@@ -68,5 +83,17 @@
   <p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:support@bebz.tv">support@bebz.tv</a>.</p>
 
 </div>
+<footer>
+  <div class="footer-links">
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms of Use</a>
+    <a href="/terms-of-sale.html">Terms of Sale</a>
+    <a href="/refund.html">Refund Policy</a>
+    <a href="/about.html">About</a>
+    <a href="/contact.html">Contact</a>
+    <a href="mailto:support@bebz.tv">support@bebz.tv</a>
+  </div>
+  <div class="footer-copy">© 2026 Bebz TV. All rights reserved.</div>
+</footer>
 </body>
 </html>
