@@ -502,6 +502,22 @@
 
 <body>
 
+
+  <!-- Disclaimer Modal -->
+  <div id="disclaimerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#1a1f2e;border:1px solid #2a3550;border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;position:relative;">
+      <button onclick="closeDisclaimer(false)" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#8494b0;font-size:20px;cursor:pointer;width:auto;padding:4px 8px;">✕</button>
+      <div style="font-size:40px;margin-bottom:16px;">🎬</div>
+      <p style="color:#d1d5db;font-size:15px;margin-bottom:8px;">I understand that BebzTV is only a</p>
+      <p style="color:#ffffff;font-size:18px;font-weight:800;margin-bottom:20px;letter-spacing:0.5px;">MEDIA PLAYER AND DOES NOT<br>PROVIDE ANY TYPE OF CONTENT.</p>
+      <p style="color:#8494b0;font-size:13px;margin-bottom:24px;">Users are responsible for their own media subscriptions. BebzTV does not host, sell, or distribute content of any kind.</p>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button onclick="closeDisclaimer(true)" style="background:#3b82f6;border:none;color:white;padding:12px 28px;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;width:auto;">I AGREE</button>
+        <button onclick="closeDisclaimer(false)" style="background:transparent;border:2px solid #2a3550;color:#8494b0;padding:12px 28px;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;width:auto;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 
@@ -511,6 +527,8 @@
   <ul class="nav-links">
     <li><a href="#features">Features</a></li>
     <li><a href="#pricing">Pricing</a></li>
+    <li><a href="/about.html">About</a></li>
+    <li><a href="/contact.html">Contact</a></li>
     <li><a href="#device-section">Manage Device</a></li>
     <li><a href="mailto:support@bebz.tv">Support</a></li>
   </ul>
@@ -686,6 +704,13 @@
         <div style="font-weight:800;font-size:26px;">$19.99</div>
       </div>
     </div>
+    <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.5;">
+      By proceeding, you confirm that BebzTV is a media player only and does not provide any content, and you agree to our <a href="/terms-of-sale.html" target="_blank" style="color:var(--accent2)">Terms of Sale</a>, <a href="/refund.html" target="_blank" style="color:var(--accent2)">Refund Policy</a>, and <a href="/privacy.html" target="_blank" style="color:var(--accent2)">Privacy Policy</a>.
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;">
+      <input type="checkbox" id="chkDisclaimer" style="width:16px;height:16px;margin-top:3px;flex-shrink:0;accent-color:var(--accent);cursor:pointer;" onchange="updateCheckoutBtn()" />
+      <label for="chkDisclaimer" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5;">I understand that BebzTV is a media player application only and <strong style="color:var(--text)">does not provide any type of content</strong>. I am responsible for my own media subscriptions.</label>
+    </div>
     <button id="btnCheckout" disabled>Select a plan above</button>
     <button id="btnBackToDashboardC" class="secondary">← Back</button>
     <div class="small-note">Secure payment processing.</div>
@@ -731,6 +756,10 @@
   <div class="footer-links">
     <a href="/privacy.html">Privacy Policy</a>
     <a href="/terms.html">Terms of Use</a>
+    <a href="/terms-of-sale.html">Terms of Sale</a>
+    <a href="/refund.html">Refund Policy</a>
+    <a href="/about.html">About</a>
+    <a href="/contact.html">Contact</a>
     <a href="mailto:support@bebz.tv">support@bebz.tv</a>
   </div>
   <div class="footer-copy">© 2026 Bebz TV. All rights reserved.</div>
@@ -1038,6 +1067,45 @@
   }
 
   // ── Plan Selection & Checkout ──
+
+  var disclaimerAgreed = false;
+
+  function showDisclaimer() {
+    document.getElementById('disclaimerModal').style.display = 'flex';
+  }
+
+  function closeDisclaimer(agreed) {
+    document.getElementById('disclaimerModal').style.display = 'none';
+    if (agreed) {
+      disclaimerAgreed = true;
+      document.getElementById('chkDisclaimer').checked = true;
+      updateCheckoutBtn();
+    }
+  }
+
+  function updateCheckoutBtn() {
+    var chk = document.getElementById('chkDisclaimer');
+    var btn = document.getElementById('btnCheckout');
+    if (!btn) return;
+    if (chk && chk.checked && selectedPlan) {
+      btn.disabled = false;
+      btn.textContent = 'Continue to Payment →';
+    } else if (selectedPlan) {
+      btn.disabled = true;
+      btn.textContent = 'Please agree to the terms above';
+    }
+  }
+
+  // Show disclaimer on first visit
+  window.addEventListener('load', function() {
+    if (!sessionStorage.getItem('disclaimerShown')) {
+      setTimeout(function() {
+        showDisclaimer();
+        sessionStorage.setItem('disclaimerShown', '1');
+      }, 800);
+    }
+  });
+
   var selectedPlan = null;
 
   function selectPlan(plan) {
@@ -1047,9 +1115,7 @@
       el.style.borderColor = (p === plan) ? '#3b82f6' : 'var(--border)';
       el.style.background  = (p === plan) ? 'rgba(59,130,246,0.08)' : 'var(--bg2)';
     });
-    var btn = document.getElementById('btnCheckout');
-    btn.textContent = 'Continue to Payment →';
-    btn.disabled = false;
+    updateCheckoutBtn();
   }
 
   async function startCheckout() {
