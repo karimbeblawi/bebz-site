@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Bebz TV</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#080e1a;--bg2:#0d1528;--card:#111827;--border:#1e2d45;--accent:#3b82f6;--accent2:#60a5fa;--text:#f0f4ff;--muted:#8494b0;--success:#4ade80;--error:#f87171}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid rgba(255,255,255,0.05)}
+    .nav-logo{font-family:'DM Sans',sans-serif;font-weight:800;font-size:20px;color:var(--text);text-decoration:none}
+    .nav-logo span{color:var(--accent2)}
+    .nav-links{display:flex;gap:24px;list-style:none}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s}
+    .nav-links a:hover{color:var(--text)}
+    .hero{text-align:center;padding:64px 24px 40px;max-width:600px;margin:0 auto}
+    .hero h1{font-family:'DM Sans',sans-serif;font-size:40px;font-weight:800;margin-bottom:12px}
+    .hero p{color:var(--muted);font-size:16px}
+    .content{max-width:860px;margin:0 auto;padding:20px 24px 80px;display:grid;grid-template-columns:1fr 1fr;gap:32px}
+    .form-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px}
+    label{display:block;font-size:13px;color:var(--muted);font-weight:500;margin-bottom:6px}
+    input,textarea,select{width:100%;padding:11px 14px;margin-bottom:16px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:15px;font-family:'Inter',sans-serif;transition:border-color 0.15s;outline:none;resize:vertical}
+    input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+    textarea{min-height:120px}
+    button{width:100%;padding:12px;background:var(--accent);border:none;border-radius:8px;color:white;font-weight:600;font-size:15px;cursor:pointer;transition:background 0.15s;font-family:'Inter',sans-serif}
+    button:hover{background:#2563eb}
+    button:disabled{background:#1e3a5f;color:#4b6a9a;cursor:not-allowed}
+    #form-msg{margin-top:10px;font-size:14px;text-align:center;min-height:20px}
+    #form-msg.success{color:var(--success)}
+    #form-msg.error{color:var(--error)}
+    .info-card{display:flex;flex-direction:column;gap:20px}
+    .info-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px}
+    .info-item h3{font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px}
+    .info-item p{font-size:14px;color:var(--muted);margin:0;line-height:1.6}
+    .info-item a{color:var(--accent2);text-decoration:none}
+    .response-badge{display:inline-block;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:var(--success);font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;margin-bottom:8px}
+    footer{border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    .footer-links{display:flex;gap:16px;flex-wrap:wrap}
+    .footer-links a{color:var(--muted);font-size:13px;text-decoration:none}
+    .footer-links a:hover{color:var(--text)}
+    .footer-copy{color:var(--muted);font-size:12px}
+    @media(max-width:700px){.content{grid-template-columns:1fr}nav{padding:16px 20px}.nav-links{display:none}footer{flex-direction:column;text-align:center}}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Bebz<span>TV</span></a>
+  <ul class="nav-links">
+    <li><a href="/#features">Features</a></li>
+    <li><a href="/#pricing">Pricing</a></li>
+    <li><a href="/about.html">About</a></li>
+    <li><a href="/contact.html">Contact</a></li>
+    <li><a href="mailto:support@bebz.tv">Support</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <h1>Get in Touch</h1>
+  <p>We typically respond within 24 hours. For urgent issues, email us directly at <a href="mailto:support@bebz.tv" style="color:var(--accent2)">support@bebz.tv</a>.</p>
+</div>
+
+<div class="content">
+  <div class="form-card">
+    <label for="cf-name">Your Name</label>
+    <input id="cf-name" type="text" placeholder="John Smith" autocomplete="name" />
+
+    <label for="cf-email">Email Address</label>
+    <input id="cf-email" type="email" placeholder="you@example.com" autocomplete="email" />
+
+    <label for="cf-subject">Subject</label>
+    <select id="cf-subject">
+      <option value="">Select a topic...</option>
+      <option value="billing">Billing / Subscription</option>
+      <option value="refund">Refund Request</option>
+      <option value="technical">Technical Support</option>
+      <option value="playlist">Playlist Help</option>
+      <option value="account">Account Issue</option>
+      <option value="other">Other</option>
+    </select>
+
+    <label for="cf-device">Device ID (optional)</label>
+    <input id="cf-device" type="text" placeholder="Shown in the BebzTV app" />
+
+    <label for="cf-message">Message</label>
+    <textarea id="cf-message" placeholder="Describe your issue or question..."></textarea>
+
+    <button id="cf-submit" onclick="submitContactForm()">Send Message</button>
+    <div id="form-msg"></div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-item">
+      <div class="response-badge">⚡ Within 24 hours</div>
+      <h3>Email Support</h3>
+      <p>Send us an email anytime at<br><a href="mailto:support@bebz.tv">support@bebz.tv</a></p>
+    </div>
+    <div class="info-item">
+      <h3>Refund Requests</h3>
+      <p>We offer a 30-day money-back guarantee. Email <a href="mailto:support@bebz.tv">support@bebz.tv</a> with your Device ID and purchase date. <a href="/refund.html">See Refund Policy →</a></p>
+    </div>
+    <div class="info-item">
+      <h3>Billing Questions</h3>
+      <p>For subscription or payment questions, include your Device ID and the email used at checkout.</p>
+    </div>
+    <div class="info-item">
+      <h3>Location</h3>
+      <p>BebzTV<br>Montreal, Quebec, Canada<br><a href="mailto:support@bebz.tv">support@bebz.tv</a></p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms of Use</a>
+    <a href="/terms-of-sale.html">Terms of Sale</a>
+    <a href="/refund.html">Refund Policy</a>
+    <a href="/about.html">About</a>
+    <a href="/contact.html">Contact</a>
+    <a href="mailto:support@bebz.tv">support@bebz.tv</a>
+  </div>
+  <div class="footer-copy">© 2026 Bebz TV. All rights reserved.</div>
+</footer>
+
+<script>
+function submitContactForm() {
+  var name    = document.getElementById('cf-name').value.trim();
+  var email   = document.getElementById('cf-email').value.trim();
+  var subject = document.getElementById('cf-subject').value;
+  var message = document.getElementById('cf-message').value.trim();
+  var msg     = document.getElementById('form-msg');
+  var btn     = document.getElementById('cf-submit');
+
+  if (!name)    { msg.textContent = 'Please enter your name.';    msg.className = 'error'; return; }
+  if (!email || !email.includes('@')) { msg.textContent = 'Please enter a valid email.'; msg.className = 'error'; return; }
+  if (!subject) { msg.textContent = 'Please select a subject.';   msg.className = 'error'; return; }
+  if (!message) { msg.textContent = 'Please enter a message.';    msg.className = 'error'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  msg.textContent = '';
+
+  // Send via mailto as fallback (replace with backend API when ready)
+  var device  = document.getElementById('cf-device').value.trim();
+  var body    = encodeURIComponent('Name: ' + name + '\nDevice ID: ' + (device || 'N/A') + '\n\n' + message);
+  var subLine = encodeURIComponent('[BebzTV Support] ' + subject);
+  window.location.href = 'mailto:support@bebz.tv?subject=' + subLine + '&body=' + body;
+
+  setTimeout(function() {
+    msg.textContent = '✓ Opening your email client... If nothing opened, email us directly at support@bebz.tv';
+    msg.className = 'success';
+    btn.disabled = false;
+    btn.textContent = 'Send Message';
+  }, 800);
+}
+</script>
+</body>
+</html>
