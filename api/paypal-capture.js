@@ -1,9 +1,7 @@
 // =============================================================
 // api/paypal-capture.js
-//
-// Captures a PayPal order after customer approves it.
-// Called automatically when PayPal redirects back to our site.
-// Activates the device in Supabase on successful capture.
+// Captures PayPal payment after customer approves and
+// activates the device in Supabase.
 // =============================================================
 
 const { createClient } = require('@supabase/supabase-js');
@@ -36,75 +34,75 @@ async function getPayPalAccessToken() {
 }
 
 function addOneYear(fromDate) {
-  const d = fromDate ? new Date(fromDate) : new Date();
-  if (isNaN(d.getTime())) return addOneYear(null);
+  var d = fromDate ? new Date(fromDate) : new Date();
+  if (isNaN(d.getTime())) d = new Date();
   d.setFullYear(d.getFullYear() + 1);
   return d.toISOString().split('T')[0];
 }
 
-export default async function handler(req, res) {
-  const { token, PayerID, device_id, plan } = req.query;
+module.exports = async function(req, res) {
+  var token     = req.query.token;
+  var device_id = req.query.device_id;
+  var plan      = req.query.plan;
 
   if (!token || !device_id || !plan) {
-    return res.redirect(`${process.env.SITE_URL}/?payment=cancelled`);
+    return res.redirect(process.env.SITE_URL + '/?payment=cancelled');
   }
 
   try {
-    const { token: accessToken, baseUrl } = await getPayPalAccessToken();
+    var auth = await getPayPalAccessToken();
 
-    // Capture the order
-    const captureResp = await fetch(`${baseUrl}/v2/checkout/orders/${token}/capture`, {
+    var captureResp = await fetch(auth.baseUrl + '/v2/checkout/orders/' + token + '/capture', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        'Authorization': 'Bearer ' + auth.token,
         'Content-Type': 'application/json'
       }
     });
 
-    const capture = await captureResp.json();
+    var capture = await captureResp.json();
 
     if (capture.status !== 'COMPLETED') {
-      console.error('PayPal capture failed:', capture);
-      return res.redirect(`${process.env.SITE_URL}/?payment=cancelled`);
+      console.error('PayPal capture failed:', JSON.stringify(capture));
+      return res.redirect(process.env.SITE_URL + '/?payment=cancelled');
     }
 
-    // Extract custom_id to get device_id and plan
-    const purchaseUnit = capture.purchase_units && capture.purchase_units[0];
-    let finalDeviceId  = device_id;
-    let finalPlan      = plan;
+    // Extract custom_id for device_id and plan
+    var finalDeviceId = device_id;
+    var finalPlan     = plan;
+    var purchaseUnit  = capture.purchase_units && capture.purchase_units[0];
 
     if (purchaseUnit && purchaseUnit.custom_id) {
       try {
-        const custom = JSON.parse(purchaseUnit.custom_id);
+        var custom = JSON.parse(purchaseUnit.custom_id);
         if (custom.device_id) finalDeviceId = custom.device_id;
         if (custom.plan)      finalPlan      = custom.plan;
-      } catch (e) {}
+      } catch(e) {}
     }
 
-    const paypalOrderId   = capture.id;
-    const paypalPayerId   = PayerID || null;
-    const expiryDate      = finalPlan === 'annual' ? addOneYear(null) : null;
+    var paypalOrderId = capture.id;
+    var payerId       = req.query.PayerID || null;
+    var expiryDate    = finalPlan === 'annual' ? addOneYear(null) : null;
 
-    // Activate device in Supabase
-    const { error } = await sb.from('devices').update({
-      status:                 'active',
-      expiry_date:            expiryDate,
-      paypal_order_id:        paypalOrderId,
-      paypal_payer_id:        paypalPayerId,
+    var result = await sb.from('devices').update({
+      status:          'active',
+      expiry_date:     expiryDate,
+      paypal_order_id: paypalOrderId,
+      paypal_payer_id: payerId
     }).eq('device_id', finalDeviceId);
 
-    if (error) {
-      console.error('Supabase error:', error.message);
+    if (result.error) {
+      console.error('Supabase error:', result.error.message);
     } else {
       console.log('Activated device:', finalDeviceId, 'plan:', finalPlan, 'expiry:', expiryDate);
     }
 
     return res.redirect(
-      `${process.env.SITE_URL}/?payment=success&plan=${finalPlan}&device_id=${encodeURIComponent(finalDeviceId)}`
+      process.env.SITE_URL + '/?payment=success&plan=' + finalPlan + '&device_id=' + encodeURIComponent(finalDeviceId)
     );
 
-  } catch (err) {
+  } catch(err) {
     console.error('Capture error:', err);
-    return res.redirect(`${process.env.SITE_URL}/?payment=cancelled`);
+    return res.redirect(process.env.SITE_URL + '/?payment=cancelled');
   }
-}
+};
