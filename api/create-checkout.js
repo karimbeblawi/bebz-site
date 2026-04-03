@@ -1,9 +1,6 @@
 // =============================================================
 // api/create-checkout.js
-//
-// Creates a PayPal order for a given plan and returns the
-// approval URL to redirect the customer to PayPal checkout.
-// Plan pricing is stored server-side — never exposed to client.
+// Creates a PayPal order and returns the approval URL.
 // =============================================================
 
 const PLAN_CONFIG = {
@@ -11,15 +8,13 @@ const PLAN_CONFIG = {
     name: 'BebzTV Annual Subscription',
     description: 'Full access to BebzTV media player for 1 year',
     amount: '8.99',
-    currency: 'USD',
-    type: 'subscription'
+    currency: 'USD'
   },
   lifetime: {
     name: 'BebzTV Lifetime Access',
     description: 'Permanent access to BebzTV media player — one-time payment',
     amount: '19.99',
-    currency: 'USD',
-    type: 'one_time'
+    currency: 'USD'
   }
 };
 
@@ -45,7 +40,7 @@ async function getPayPalAccessToken() {
   return { token: data.access_token, baseUrl };
 }
 
-export default async function handler(req, res) {
+module.exports = async function(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -74,7 +69,7 @@ export default async function handler(req, res) {
         intent: 'CAPTURE',
         purchase_units: [
           {
-            reference_id: `${device_id}_${plan}`,
+            reference_id: device_id + '_' + plan,
             description: planConfig.description,
             custom_id: JSON.stringify({ device_id, plan }),
             amount: {
@@ -99,8 +94,8 @@ export default async function handler(req, res) {
           brand_name: 'BebzTV',
           landing_page: 'NO_PREFERENCE',
           user_action: 'PAY_NOW',
-          return_url: `${process.env.SITE_URL}/api/paypal-capture?device_id=${encodeURIComponent(device_id)}&plan=${plan}`,
-          cancel_url: `${process.env.SITE_URL}/?payment=cancelled`
+          return_url: process.env.SITE_URL + '/api/paypal-capture?device_id=' + encodeURIComponent(device_id) + '&plan=' + plan,
+          cancel_url: process.env.SITE_URL + '/?payment=cancelled'
         }
       })
     });
@@ -108,12 +103,11 @@ export default async function handler(req, res) {
     const order = await orderResp.json();
 
     if (!order.id) {
-      console.error('PayPal order error:', order);
+      console.error('PayPal order error:', JSON.stringify(order));
       return res.status(500).json({ error: 'Failed to create PayPal order' });
     }
 
-    // Find the approval URL
-    const approvalLink = order.links.find(l => l.rel === 'approve');
+    const approvalLink = order.links.find(function(l) { return l.rel === 'approve'; });
     if (!approvalLink) {
       return res.status(500).json({ error: 'No approval URL from PayPal' });
     }
@@ -124,4 +118,4 @@ export default async function handler(req, res) {
     console.error('PayPal error:', err);
     return res.status(500).json({ error: 'Failed to create checkout session' });
   }
-}
+};
