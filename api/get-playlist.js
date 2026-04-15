@@ -45,15 +45,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { device_id } = req.query;
+  const { device_id, app_id } = req.query;
 
   if (!device_id) {
     return res.status(400).json({ error: 'Missing device_id' });
   }
 
-  // Fetch the most recent unconsumed link for this device
+  const linksTable = (app_id === 'arabic_iptv') ? 'device_links_arabic' : 'device_links';
+
   const { data, error } = await supabase
-    .from('device_links')
+    .from(linksTable)
     .select('id, device_id, playlist_name, playlist_url, username, password')
     .eq('device_id', device_id)
     .eq('consumed', false)

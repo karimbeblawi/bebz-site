@@ -49,6 +49,8 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Encryption key not configured' });
   }
 
+  const linksTable = (app_id === 'arabic_iptv') ? 'device_links_arabic' : 'device_links';
+
   const expires = new Date();
   expires.setMinutes(expires.getMinutes() + 10);
 
@@ -67,7 +69,7 @@ export default async function handler(req, res) {
   };
 
   const { data, error } = await supabase
-    .from('device_links')
+    .from(linksTable)
     .insert([payload])
     .select('id');
 

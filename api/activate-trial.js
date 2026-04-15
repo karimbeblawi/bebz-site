@@ -13,17 +13,21 @@ module.exports = async function(req, res) {
   const { device_id, app_id } = req.body || {};
   if (!device_id) return res.status(400).json({ error: 'device_id required' });
 
+  const devicesTable = (app_id === 'arabic_iptv') ? 'devices_arabic' : 'devices';
+
   // Fetch current device row
-  const { data, error } = await sb
-    .from('devices')
-    .select('status, expiry_date, trial_start_at')
-    .eq('device_id', device_id)
-    .limit(1);
+  let query = sb.from(devicesTable).select('status, expiry_date, trial_start_at').eq('device_id', device_id).limit(1);
+  const { data, error } = await query;
 
   if (error) return res.status(500).json({ error: error.message });
-  if (!data || data.length === 0) return res.status(404).json({ error: 'Device not found' });
 
-  const device = data[0];
+  // If no record exists, create one
+  if (!data || data.length === 0) {
+    const { error: insertError } = await sb.from(devicesTable).insert([{ device_id, status: 'inactive' }]);
+    if (insertError) return res.status(500).json({ error: insertError.message });
+  }
+
+  const device = data && data.length > 0 ? data[0] : { status: 'inactive', expiry_date: null, trial_start_at: null };
   const status = device.status;
 
   // Never downgrade an active/paid device
@@ -49,10 +53,8 @@ module.exports = async function(req, res) {
   };
   if (app_id) updatePayload.app_id = app_id;
 
-  const { error: updateError } = await sb
-    .from('devices')
-    .update(updatePayload)
-    .eq('device_id', device_id);
+  let updateQuery = sb.from(devicesTable).update(updatePayload).eq('device_id', device_id);
+  const { error: updateError } = await updateQuery;
 
   if (updateError) return res.status(500).json({ error: updateError.message });
 
