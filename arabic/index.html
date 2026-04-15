@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bebz Arabic IPTV Player — Media Player for Roku</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080e1a;
+      --bg2:       #0d1528;
+      --card:      #111827;
+      --border:    #1e2d45;
+      --accent:    #3b82f6;
+      --accent2:   #60a5fa;
+      --text:      #f0f4ff;
+      --muted:     #8494b0;
+      --success:   #4ade80;
+      --error:     #f87171;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("../background1.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-attachment: fixed;
+      background-color: #cccccc;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 { width: 600px; height: 600px; background: rgba(59,130,246,0.12); top: -200px; left: -150px; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(96,165,250,0.08); bottom: 100px; right: -100px; }
+
+    nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 48px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .nav-logo { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -0.5px; color: var(--text); text-decoration: none; }
+    .nav-logo span { color: var(--accent2); }
+
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+
+    .hero {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 100px 24px 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.25);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 13px;
+      color: var(--accent2);
+      font-weight: 500;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent2);
+      border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 800;
+      font-size: clamp(42px, 7vw, 72px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent2), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 580px;
+      margin: 0 auto 48px;
+      font-weight: 300;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation: fadeUp 0.6s 0.3s ease both; }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 32px; background: var(--accent); color: white;
+      border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 0 30px rgba(59,130,246,0.3); font-family: 'Inter', sans-serif;
+    }
+    .btn-primary:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 0 40px rgba(59,130,246,0.4); }
+
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 32px; background: transparent; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 10px; font-size: 15px;
+      font-weight: 500; cursor: pointer; text-decoration: none;
+      transition: border-color 0.15s, color 0.15s; font-family: 'Inter', sans-serif;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--text); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .features {
+      position: relative; z-index: 1;
+      max-width: 960px; margin: 0 auto;
+      padding: 40px 24px 100px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 28px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .feature-card:hover { border-color: rgba(59,130,246,0.4); transform: translateY(-2px); }
+    .feature-icon { font-size: 28px; margin-bottom: 16px; }
+    .feature-card h3 { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .feature-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    .section-divider { position: relative; z-index: 1; text-align: center; padding: 20px 24px 60px; }
+    .section-divider h2 { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; color: var(--muted); }
+
+    #device-section { position: relative; z-index: 1; display: flex; justify-content: center; padding: 0 24px 100px; }
+
+    .card { width: 100%; max-width: 420px; background: var(--card); padding: 32px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 0 60px rgba(0,0,0,0.4); }
+
+    .hidden { display: none !important; }
+
+    .field-label { font-size: 13px; color: var(--muted); margin-bottom: 6px; display: block; font-weight: 500; }
+
+    input {
+      width: 100%; padding: 12px 14px; margin-bottom: 14px;
+      border-radius: 8px; border: 1px solid var(--border); outline: none;
+      background: var(--bg2); color: var(--text); font-size: 15px;
+      font-family: 'Inter', sans-serif; transition: border-color 0.15s;
+    }
+    input:focus { border-color: var(--accent); }
+    input[readonly] { opacity: 0.8; cursor: default; }
+
+    .info-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+    .info-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 15px; }
+    .info-row:last-child { margin-bottom: 0; }
+    .info-label { color: var(--muted); width: 110px; flex-shrink: 0; font-size: 13px; }
+
+    .status-pill { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; text-transform: capitalize; background: #1e2d45; color: var(--muted); }
+    .status-pill.active     { background: #14532d; color: var(--success); }
+    .status-pill.free_trial { background: #1e3a5f; color: var(--accent2); }
+    .status-pill.expired    { background: #450a0a; color: var(--error); }
+    .status-pill.inactive   { background: #1e2d45; color: var(--muted); }
+
+    .expiry-note { font-size: 12px; color: var(--accent2); margin-left: 8px; }
+    .expiry-note.warn { color: #f59e0b; }
+    .expiry-note.over { color: var(--error); }
+
+    button {
+      width: 100%; padding: 12px; background: var(--accent); border: none;
+      border-radius: 8px; color: white; font-weight: 600; font-size: 15px;
+      cursor: pointer; margin-bottom: 12px; transition: background 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    button:hover { background: #2563eb; }
+    button:disabled { background: #1e3a5f; color: #4b6a9a; cursor: not-allowed; }
+    button.secondary { background: #1a2640; color: var(--muted); border: 1px solid var(--border); }
+    button.secondary:hover { background: #243150; color: var(--text); }
+    button.secondary:disabled { background: #111827; color: #4b6a9a; cursor: not-allowed; }
+
+    #msg { margin-top: 10px; font-size: 14px; text-align: center; color: var(--muted); min-height: 20px; line-height: 1.4; }
+    #msg.error   { color: var(--error); }
+    #msg.success { color: var(--success); }
+
+    .small-note { color: var(--muted); font-size: 13px; line-height: 1.5; text-align: center; margin-top: 8px; }
+    .divider-line { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+    h2.card-title { font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 20px; }
+    h1.card-logo { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 22px; text-align: center; margin-bottom: 8px; }
+    h1.card-logo span { color: var(--accent2); }
+
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 32px 48px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    }
+    .footer-left { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); }
+    .footer-left span { color: var(--accent2); }
+    .footer-links { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { color: var(--muted); font-size: 12px; text-align: right; }
+
+    @media (max-width: 600px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      footer { flex-direction: column; text-align: center; }
+      .footer-copy { text-align: center; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Disclaimer Modal -->
+  <div id="disclaimerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#1a1f2e;border:1px solid #2a3550;border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;position:relative;">
+      <button onclick="closeDisclaimer(false)" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#8494b0;font-size:20px;cursor:pointer;width:auto;padding:4px 8px;">✕</button>
+      <div style="font-size:40px;margin-bottom:16px;">🎬</div>
+      <p style="color:#d1d5db;font-size:15px;margin-bottom:8px;">I understand that Bebz Arabic IPTV Player is only a</p>
+      <p style="color:#ffffff;font-size:18px;font-weight:800;margin-bottom:20px;letter-spacing:0.5px;">MEDIA PLAYER AND DOES NOT<br>PROVIDE ANY TYPE OF CONTENT.</p>
+      <p style="color:#8494b0;font-size:13px;margin-bottom:24px;">Users are responsible for their own media subscriptions. Bebz Arabic IPTV Player does not host, sell, or distribute content of any kind.</p>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button onclick="closeDisclaimer(true)" style="background:#3b82f6;border:none;color:white;padding:12px 28px;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;width:auto;">I AGREE</button>
+        <button onclick="closeDisclaimer(false)" style="background:transparent;border:2px solid #2a3550;color:#8494b0;padding:12px 28px;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;width:auto;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="/arabic/" class="nav-logo">Bebz <span>Arabic IPTV</span></a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="/about.html">About</a></li>
+    <li><a href="/contact.html">Contact</a></li>
+    <li><a href="#device-section">Manage Device</a></li>
+    <li><a href="mailto:support@bebz.tv">Support</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">Now available on Roku</div>
+
+  <h1>Arabic IPTV,<br><span>beautifully played.</span></h1>
+
+  <p>Bebz Arabic IPTV Player is a fast, elegant media player for Roku built for Arabic-speaking audiences. Full right-to-left Arabic text, live TV, movies, and series — plus 200+ free Arabic live channels included.</p>
+
+  <div style="display:inline-flex;flex-direction:column;gap:10px;margin-bottom:36px;text-align:left;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:12px;padding:20px 28px;">
+    <div style="display:flex;align-items:center;gap:10px;font-size:15px;color:#c9d3e8;"><span style="color:#4ade80;font-size:18px;">✅</span><span><strong style="color:#f0f4ff;">Try Before You Buy</strong> — Full 30-day free trial, no credit card required</span></div>
+    <div style="display:flex;align-items:center;gap:10px;font-size:15px;color:#c9d3e8;"><span style="color:#4ade80;font-size:18px;">✅</span><span><strong style="color:#f0f4ff;">200+ Free Arabic channels</strong> — Included at no cost, no subscription needed</span></div>
+    <div style="display:flex;align-items:center;gap:10px;font-size:15px;color:#c9d3e8;"><span style="color:#4ade80;font-size:18px;">✅</span><span><strong style="color:#f0f4ff;">Full Arabic support</strong> — Native RTL text throughout the entire app</span></div>
+    <div style="display:flex;align-items:center;gap:10px;font-size:15px;color:#c9d3e8;"><span style="color:#4ade80;font-size:18px;">✅</span><span><strong style="color:#f0f4ff;">Available on Roku</strong> — Install free from the Roku Channel Store</span></div>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#device-section" class="btn-primary">⚙️ Manage My Device</a>
+    <a href="https://channelstore.roku.com" class="btn-secondary" target="_blank">📺 Get on Roku</a>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="feature-card">
+    <div class="feature-icon">🌍</div>
+    <h3>Full Arabic Support</h3>
+    <p>Native right-to-left Arabic text rendering throughout the entire app — built specifically for Arabic-speaking audiences in North America.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">📡</div>
+    <h3>200+ Free Arabic Channels</h3>
+    <p>Enjoy hundreds of free live Arabic channels built right in — news, entertainment, kids, religious and more. No subscription needed.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🎬</div>
+    <h3>Live, Movies & Series</h3>
+    <p>Browse live channels with live preview, VOD movies with details, and full series with episode and season navigation.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">📋</div>
+    <h3>Bring Your Own Playlist</h3>
+    <p>Connect your personal media subscription using Xtream Codes API or an M3U playlist URL. Works with any provider.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">❤️</div>
+    <h3>Favorites & Continue Watching</h3>
+    <p>Save your favourite channels and pick up movies and series right where you left off.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">✨</div>
+    <h3>Smart Screensaver</h3>
+    <p>A beautiful screensaver that showcases movie and series art from your own playlist.</p>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" style="position:relative;z-index:1;max-width:960px;margin:0 auto;padding:40px 24px 80px;">
+  <h2 style="font-family:'DM Sans',sans-serif;font-size:32px;font-weight:800;text-align:center;margin-bottom:12px;">Simple Pricing</h2>
+  <p style="text-align:center;color:var(--muted);margin-bottom:48px;font-size:16px;">One app, two plans. No hidden fees.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:36px;text-align:center;">
+      <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px;">Annual</div>
+      <div style="font-size:42px;font-weight:800;margin-bottom:8px;">$8.99<span style="font-size:16px;font-weight:400;color:var(--muted);">/yr</span></div>
+      <div style="color:var(--muted);font-size:14px;margin-bottom:24px;">Full access, renewed yearly</div>
+      <a href="#device-section" style="display:inline-block;padding:12px 32px;background:var(--accent);color:white;border-radius:8px;font-weight:600;text-decoration:none;">Get Started</a>
+    </div>
+    <div style="background:var(--card);border:2px solid var(--accent);border-radius:16px;padding:36px;text-align:center;position:relative;">
+      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;font-size:12px;font-weight:600;padding:4px 12px;border-radius:999px;">BEST VALUE</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px;">Lifetime</div>
+      <div style="font-size:42px;font-weight:800;margin-bottom:8px;">$19.99</div>
+      <div style="color:var(--muted);font-size:14px;margin-bottom:24px;">Pay once, watch forever</div>
+      <a href="#device-section" style="display:inline-block;padding:12px 32px;background:var(--accent);color:white;border-radius:8px;font-weight:600;text-decoration:none;">Get Started</a>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION LABEL -->
+<div class="section-divider">
+  <h2>Device Management</h2>
+</div>
+
+<!-- DEVICE MANAGEMENT CARD -->
+<section id="device-section">
+<div class="card">
+
+  <!-- SCREEN: Link -->
+  <section id="screen-link">
+    <h1 class="card-logo">Bebz <span>Arabic IPTV</span></h1>
+    <p class="small-note" style="margin-bottom:22px;">Link your device to activate it or add a playlist.</p>
+
+    <label class="field-label" for="device_id_link">Device ID</label>
+    <input id="device_id_link" placeholder="Enter Device ID shown on your TV" autocomplete="off" />
+
+    <button id="btnLinkDevice">Link Device</button>
+
+    <div class="small-note">Type the Device ID manually, or scan the QR code shown on your TV.</div>
+  </section>
+
+  <!-- SCREEN: Dashboard -->
+  <section id="screen-dashboard" class="hidden">
+    <h2 class="card-title">Device Dashboard</h2>
+    <div class="info-box">
+      <div class="info-row">
+        <span class="info-label">Device ID</span>
+        <span id="dashDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Status</span>
+        <span id="dashStatus" class="status-pill inactive">inactive</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Expiry</span>
+        <span id="dashExpiry">—</span>
+        <span id="dashExpiryNote" class="expiry-note hidden"></span>
+      </div>
+    </div>
+    <button id="btnGoActivate">Start Free Trial</button>
+    <button id="btnGoSubscribe" class="secondary">Subscribe / Renew</button>
+    <button id="btnGoPlaylist" class="secondary">Add Playlist</button>
+    <hr class="divider-line" />
+    <button id="btnBackToLink" class="secondary">← Back</button>
+  </section>
+
+  <!-- SCREEN: Activate -->
+  <section id="screen-activate" class="hidden">
+    <h2 class="card-title">Activate Device</h2>
+    <div class="info-box">
+      <div class="info-row">
+        <span class="info-label">Device ID</span>
+        <span id="activateDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Status</span>
+        <span id="activateStatus" class="status-pill inactive">inactive</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Expiry</span>
+        <span id="activateExpiry">—</span>
+      </div>
+    </div>
+    <button id="btnActivateNow">Start 30-Day Free Trial</button>
+    <button id="btnBackToDashboardA" class="secondary">← Back</button>
+    <div class="small-note" id="activateNote">Starting a trial gives you full access for 30 days. No credit card required.</div>
+  </section>
+
+  <!-- SCREEN: Subscribe -->
+  <section id="screen-subscribe" class="hidden">
+    <h2 class="card-title">Choose a Plan</h2>
+    <div class="info-box">
+      <div class="info-row"><span class="info-label">Device ID</span><span id="subscribeDeviceId" style="font-family:monospace;font-size:13px;word-break:break-all"></span></div>
+      <div class="info-row"><span class="info-label">Status</span><span id="subscribeStatus" class="status-pill inactive">inactive</span></div>
+    </div>
+    <div id="plan-annual" onclick="selectPlan('annual')" style="background:var(--bg2);border:2px solid var(--border);border-radius:10px;padding:18px;margin-bottom:12px;cursor:pointer;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-weight:700;font-size:17px;margin-bottom:4px;">Annual</div><div style="font-size:13px;color:var(--muted);">Full access, renewed yearly</div></div>
+        <div style="font-weight:800;font-size:26px;white-space:nowrap;">$8.99<span style="font-size:14px;color:var(--muted);font-weight:400;">/yr</span></div>
+      </div>
+    </div>
+    <div id="plan-lifetime" onclick="selectPlan('lifetime')" style="background:var(--bg2);border:2px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px;cursor:pointer;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-weight:700;font-size:17px;margin-bottom:4px;">Lifetime</div><div style="font-size:13px;color:var(--muted);">Pay once, watch forever</div></div>
+        <div style="font-weight:800;font-size:26px;">$19.99</div>
+      </div>
+    </div>
+    <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.5;">
+      By proceeding, you confirm that Bebz Arabic IPTV Player is a media player only and does not provide any content, and you agree to our <a href="terms-of-sale.html" target="_blank" style="color:var(--accent2)">Terms of Sale</a>, <a href="refund.html" target="_blank" style="color:var(--accent2)">Refund Policy</a>, and <a href="privacy.html" target="_blank" style="color:var(--accent2)">Privacy Policy</a>.
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;">
+      <input type="checkbox" id="chkDisclaimer" style="width:16px;height:16px;margin-top:3px;flex-shrink:0;accent-color:var(--accent);cursor:pointer;" onchange="updateCheckoutBtn()" />
+      <label for="chkDisclaimer" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5;">I understand that Bebz Arabic IPTV Player is a media player application only and <strong style="color:var(--text)">does not provide any type of content</strong>. I am responsible for my own media subscriptions.</label>
+    </div>
+    <button id="btnCheckout" disabled>Select a plan above</button>
+    <button id="btnBackToDashboardC" class="secondary">← Back</button>
+    <div class="small-note">🔒 Secure payment via PayPal. No PayPal account required — pay by card.</div>
+  </section>
+
+  <!-- SCREEN: Playlist -->
+  <section id="screen-playlist" class="hidden">
+    <h2 class="card-title">Add Playlist</h2>
+    <label class="field-label">Device ID</label>
+    <input id="device_id_playlist" readonly />
+    <label class="field-label" for="playlist_name">Playlist Name</label>
+    <input id="playlist_name" placeholder="My Playlist (optional)" />
+    <label class="field-label" for="playlist_url">Portal URL or M3U Link</label>
+    <input id="playlist_url" placeholder="http://example.com:8080  or  https://…/list.m3u" />
+    <label class="field-label" for="username">Username</label>
+    <input id="username" placeholder="Username" />
+    <label class="field-label" for="password">Password</label>
+    <div style="position:relative;">
+      <input id="password" placeholder="Password" type="password" style="width:100%;box-sizing:border-box;padding-right:44px;" />
+      <span onclick="togglePasswordVisibility()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;line-height:0;color:var(--muted);pointer-events:all;width:28px;height:28px;display:flex;align-items:center;justify-content:flex-end;" title="Show/hide password">
+        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </span>
+    </div>
+    <button id="btnAddPlaylist">Add Playlist</button>
+    <button id="btnBackToDashboardB" class="secondary">← Back</button>
+    <div class="small-note">Adding a playlist does not remove existing playlists on your TV.</div>
+  </section>
+
+  <div id="msg"></div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">Bebz <span>Arabic IPTV</span></div>
+  <div class="footer-links">
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Use</a>
+    <a href="terms-of-sale.html">Terms of Sale</a>
+    <a href="refund.html">Refund Policy</a>
+    <a href="/about.html">About</a>
+    <a href="/contact.html">Contact</a>
+    <a href="mailto:support@bebz.tv">support@bebz.tv</a>
+    <a href="https://x.com/bebzTV" target="_blank">𝕏 @BebzTV</a>
+  </div>
+  <div class="footer-copy">© 2026 Bebz TV. All rights reserved.</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const APP_ID = 'arabic_iptv';
+
+  const SUPABASE_URL = 'https://qsmuvkwhrzbydncdiphu.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_GXoX0HbGSg4njByYEmRPAw_B7sRBLDI';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentDeviceId  = '';
+  let currentDeviceRow = null;
+
+  const screens = {
+    link:      document.getElementById('screen-link'),
+    dashboard: document.getElementById('screen-dashboard'),
+    activate:  document.getElementById('screen-activate'),
+    subscribe: document.getElementById('screen-subscribe'),
+    playlist:  document.getElementById('screen-playlist'),
+  };
+
+  function showScreen(name) {
+    Object.values(screens).forEach(s => s.classList.add('hidden'));
+    screens[name].classList.remove('hidden');
+    setMsg('');
+    if (name !== 'link') {
+      document.getElementById('device-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function setMsg(text, type) {
+    const el = document.getElementById('msg');
+    el.textContent = text || '';
+    el.className = type || '';
+  }
+
+  function setBtn(id, text, disabled) {
+    const b = document.getElementById(id);
+    b.textContent = text;
+    b.disabled = !!disabled;
+  }
+
+  function formatExpiry(value) {
+    if (!value) return '—';
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return value;
+    return d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+  }
+
+  function expiryCountdown(value) {
+    if (!value) return null;
+    const exp = new Date(value);
+    if (isNaN(exp.getTime())) return null;
+    const diffDays = Math.ceil((exp - Date.now()) / 86400000);
+    if (diffDays < 0)   return { text: 'expired',           cls: 'over' };
+    if (diffDays === 0) return { text: 'expires today',     cls: 'warn' };
+    if (diffDays <= 3)  return { text: diffDays + 'd left', cls: 'warn' };
+    return                     { text: diffDays + 'd left', cls: '' };
+  }
+
+  function applyStatusPill(el, status) {
+    el.className = 'status-pill ' + (status || 'inactive');
+    el.textContent = (status || 'inactive').replace('_', ' ');
+  }
+
+  function populateDashboard(row) {
+    const id     = row.device_id   || '';
+    const status = row.status      || 'inactive';
+    const expiry = row.expiry_date || null;
+
+    document.getElementById('dashDeviceId').textContent = id;
+    applyStatusPill(document.getElementById('dashStatus'), status);
+    document.getElementById('dashExpiry').textContent = formatExpiry(expiry);
+
+    const noteEl = document.getElementById('dashExpiryNote');
+    const cd = expiryCountdown(expiry);
+    if (cd) {
+      noteEl.textContent = '(' + cd.text + ')';
+      noteEl.className   = 'expiry-note ' + cd.cls;
+      noteEl.classList.remove('hidden');
+    } else {
+      noteEl.classList.add('hidden');
+    }
+
+    document.getElementById('activateDeviceId').textContent = id;
+    applyStatusPill(document.getElementById('activateStatus'), status);
+    document.getElementById('activateExpiry').textContent = formatExpiry(expiry);
+    document.getElementById('device_id_playlist').value = id;
+    document.getElementById('subscribeDeviceId').textContent = id;
+    applyStatusPill(document.getElementById('subscribeStatus'), status);
+
+    const alreadyActive = (status === 'active' || status === 'free_trial');
+    const noExpiry = (!expiry);
+    const isLifetime = (status === 'active' && noExpiry);
+    const btnGoAct = document.getElementById('btnGoActivate');
+    btnGoAct.textContent = alreadyActive ? 'Free Trial Started' : 'Start Free Trial';
+    btnGoAct.disabled = alreadyActive;
+    const btnGoSub = document.getElementById('btnGoSubscribe');
+    if (isLifetime) { btnGoSub.textContent = 'Lifetime ✓'; btnGoSub.disabled = true; }
+    else { btnGoSub.textContent = alreadyActive ? 'Renew / Upgrade' : 'Subscribe'; btnGoSub.disabled = false; }
+    const btnAct = document.getElementById('btnActivateNow');
+    if (alreadyActive) { btnAct.textContent = 'Already Active'; btnAct.disabled = true; }
+    else { btnAct.textContent = 'Start 30-Day Free Trial'; btnAct.disabled = false; }
+  }
+
+  function normalizeDeviceId(v) { return (v || '').trim().toUpperCase(); }
+  function getQueryParam(name) { return new URLSearchParams(window.location.search).get(name) || ''; }
+
+  async function getOrCreateDevice(deviceId) {
+    const r1 = await sb.from('devices').select('*').eq('device_id', deviceId).limit(1);
+    if (r1.error) throw new Error(r1.error.message);
+    if (r1.data && r1.data.length > 0) return r1.data[0];
+
+    const r2 = await sb.from('devices').insert([{ device_id: deviceId, status: 'inactive', app_id: APP_ID }]).select();
+    if (r2.error) throw new Error(r2.error.message);
+    if (!r2.data || r2.data.length === 0) throw new Error('Could not create device record.');
+    return r2.data[0];
+  }
+
+  async function linkDevice() {
+    const id = normalizeDeviceId(document.getElementById('device_id_link').value);
+    if (!id) { setMsg('Please enter a Device ID.', 'error'); return; }
+
+    setBtn('btnLinkDevice', 'Linking…', true);
+    setMsg('Looking up device…');
+
+    try {
+      const row = await getOrCreateDevice(id);
+      currentDeviceId  = row.device_id;
+      currentDeviceRow = row;
+      populateDashboard(row);
+      showScreen('dashboard');
+    } catch (err) {
+      setMsg('Error: ' + err.message, 'error');
+    } finally {
+      setBtn('btnLinkDevice', 'Link Device', false);
+    }
+  }
+
+  async function activateDevice() {
+    if (!currentDeviceId) { setMsg('No device linked.', 'error'); return; }
+
+    const status = (currentDeviceRow && currentDeviceRow.status) ? currentDeviceRow.status : 'inactive';
+    if (status === 'active' || status === 'free_trial') {
+      setMsg('This device is already active.', 'success');
+      return;
+    }
+
+    setBtn('btnActivateNow', 'Activating…', true);
+    setMsg('Granting free trial…');
+
+    try {
+      const resp = await fetch('/api/activate-trial', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id: currentDeviceId, app_id: APP_ID }),
+      });
+      const data = await resp.json();
+      if (data.error) {
+        if (data.error.includes('already used its free trial')) {
+          throw new Error('This device has already used its free trial. Please subscribe to continue.');
+        }
+        throw new Error(data.error);
+      }
+
+      const expiryIso = data.expiry_date;
+      const updated = Object.assign({}, currentDeviceRow, { status: 'free_trial', expiry_date: expiryIso });
+      currentDeviceRow = updated;
+      populateDashboard(updated);
+      setMsg('✓ Free trial activated! Expires ' + formatExpiry(expiryIso) + '.', 'success');
+
+      document.getElementById('activateNote').innerHTML =
+        '✓ Trial active until <strong>' + formatExpiry(expiryIso) + '</strong>. Return to your TV — it will detect the activation automatically.';
+    } catch (err) {
+      setMsg('Error: ' + err.message, 'error');
+      setBtn('btnActivateNow', 'Start 30-Day Free Trial', false);
+    }
+  }
+
+  const TRANSMISSION_TIMEOUT_MS = 2 * 60 * 1000;
+  const PICKUP_POLL_MS = 3000;
+  let transmissionTimer  = null;
+  let pendingLinkId      = null;
+  let countdownInterval  = null;
+  let pickupPollInterval = null;
+
+  function startTransmissionTimer(linkId) {
+    pendingLinkId = linkId;
+    let secondsLeft = TRANSMISSION_TIMEOUT_MS / 1000;
+    updateCountdownMsg(secondsLeft);
+
+    countdownInterval = setInterval(function() {
+      secondsLeft -= 1;
+      if (secondsLeft > 0) updateCountdownMsg(secondsLeft);
+    }, 1000);
+
+    pickupPollInterval = setInterval(async function() {
+      if (!pendingLinkId) return;
+      const r = await sb.from('device_links').select('id').eq('id', Number(pendingLinkId)).limit(1);
+      if (!r.data || r.data.length === 0) {
+        cancelTransmissionTimer();
+        setMsg('✓ Playlist received by your TV!', 'success');
+        setBtn('btnAddPlaylist', 'Add Playlist', false);
+      }
+    }, PICKUP_POLL_MS);
+
+    transmissionTimer = setTimeout(async function() {
+      clearInterval(countdownInterval);  countdownInterval  = null;
+      clearInterval(pickupPollInterval); pickupPollInterval = null;
+      if (pendingLinkId) {
+        await sb.from('device_links').delete().eq('id', Number(pendingLinkId));
+        pendingLinkId = null;
+      }
+      setMsg('Transmission failed — TV did not respond. Make sure your TV is on and the app is open, then try again.', 'error');
+      setBtn('btnAddPlaylist', 'Add Playlist', false);
+    }, TRANSMISSION_TIMEOUT_MS);
+  }
+
+  function cancelTransmissionTimer() {
+    if (transmissionTimer)  { clearTimeout(transmissionTimer);   transmissionTimer  = null; }
+    if (countdownInterval)  { clearInterval(countdownInterval);  countdownInterval  = null; }
+    if (pickupPollInterval) { clearInterval(pickupPollInterval); pickupPollInterval = null; }
+    pendingLinkId = null;
+    setBtn('btnAddPlaylist', 'Add Playlist', false);
+    setMsg('');
+  }
+
+  function updateCountdownMsg(secondsLeft) {
+    const m = Math.floor(secondsLeft / 60);
+    const s = secondsLeft % 60;
+    setMsg('✓ Playlist sent! Waiting for your TV… (' + (m > 0 ? m + 'm ' : '') + s + 's)', 'success');
+  }
+
+  function togglePasswordVisibility() {
+    var input = document.getElementById('password');
+    var icon = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    } else {
+      input.type = 'password';
+      icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  }
+
+  async function addPlaylist() {
+    const url      = document.getElementById('playlist_url').value.trim();
+    const name     = document.getElementById('playlist_name').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const isM3u    = url.toLowerCase().endsWith('.m3u') || url.toLowerCase().endsWith('.m3u8');
+
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); showScreen('link'); return; }
+    if (!url) { setMsg('Portal URL is required.', 'error'); return; }
+    if (!url.startsWith('http://') && !url.startsWith('https://')) { setMsg('URL must start with http:// or https://', 'error'); return; }
+    if (!isM3u && (!username || !password)) { setMsg('Portal URL, Username, and Password are required.', 'error'); return; }
+
+    const expires = new Date();
+    expires.setMinutes(expires.getMinutes() + 10);
+
+    const payload = {
+      device_id:     currentDeviceId,
+      playlist_name: name || (isM3u ? 'M3U Playlist' : 'My Playlist'),
+      playlist_url:  url,
+      username:      isM3u ? '' : username,
+      password:      isM3u ? '' : password,
+      consumed:      false,
+      expires_at:    expires.toISOString(),
+      app_id:        APP_ID,
+    };
+
+    cancelTransmissionTimer();
+    setBtn('btnAddPlaylist', 'Sending…', true);
+    setMsg('Sending to your TV…');
+
+    const r = await fetch('/api/add-playlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const rData = await r.json();
+    if (!r.ok) { setMsg('Error: ' + (rData.error || 'Failed to send'), 'error'); setBtn('btnAddPlaylist', 'Add Playlist', false); return; }
+
+    ['playlist_name','playlist_url','username','password'].forEach(function(id) {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('device_id_playlist').value = currentDeviceId;
+
+    const insertedId = rData.id || null;
+    if (insertedId) {
+      startTransmissionTimer(insertedId);
+    } else {
+      setMsg('✓ Playlist sent! Your TV will load it within seconds.', 'success');
+      setBtn('btnAddPlaylist', 'Add Playlist', false);
+    }
+  }
+
+  var disclaimerAgreed = false;
+
+  function showDisclaimer() {
+    document.getElementById('disclaimerModal').style.display = 'flex';
+  }
+
+  function closeDisclaimer(agreed) {
+    document.getElementById('disclaimerModal').style.display = 'none';
+    if (agreed) {
+      disclaimerAgreed = true;
+      document.getElementById('chkDisclaimer').checked = true;
+      updateCheckoutBtn();
+    }
+  }
+
+  function updateCheckoutBtn() {
+    var chk = document.getElementById('chkDisclaimer');
+    var btn = document.getElementById('btnCheckout');
+    if (!btn) return;
+    if (chk && chk.checked && selectedPlan) {
+      btn.disabled = false;
+      btn.textContent = 'Continue to Payment →';
+    } else if (selectedPlan) {
+      btn.disabled = true;
+      btn.textContent = 'Please agree to the terms above';
+    }
+  }
+
+  window.addEventListener('load', function() {
+    if (!sessionStorage.getItem('disclaimerShown')) {
+      setTimeout(function() {
+        showDisclaimer();
+        sessionStorage.setItem('disclaimerShown', '1');
+      }, 800);
+    }
+  });
+
+  var selectedPlan = null;
+
+  function selectPlan(plan) {
+    selectedPlan = plan;
+    ['annual','lifetime'].forEach(function(p) {
+      var el = document.getElementById('plan-' + p);
+      el.style.borderColor = (p === plan) ? '#3b82f6' : 'var(--border)';
+      el.style.background  = (p === plan) ? 'rgba(59,130,246,0.08)' : 'var(--bg2)';
+    });
+    updateCheckoutBtn();
+  }
+
+  async function startCheckout() {
+    if (!selectedPlan) { setMsg('Please select a plan.', 'error'); return; }
+    if (!currentDeviceId) { setMsg('No device linked.', 'error'); return; }
+    var btn = document.getElementById('btnCheckout');
+    btn.textContent = 'Redirecting…'; btn.disabled = true;
+    setMsg('Opening secure checkout…');
+    try {
+      var resp = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id: currentDeviceId, plan: selectedPlan, app_id: APP_ID }),
+      });
+      var data = await resp.json();
+      if (data.error) throw new Error(data.error);
+      window.location.href = data.url;
+    } catch (err) {
+      setMsg('Error: ' + err.message, 'error');
+      btn.textContent = 'Continue to Payment →'; btn.disabled = false;
+    }
+  }
+
+  // Event Listeners
+  document.getElementById('btnLinkDevice').addEventListener('click', linkDevice);
+  document.getElementById('device_id_link').addEventListener('keydown', function(e) { if (e.key === 'Enter') linkDevice(); });
+  document.getElementById('btnGoSubscribe').addEventListener('click', function() {
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
+    selectedPlan = null;
+    ['annual','lifetime'].forEach(function(p) { var el=document.getElementById('plan-'+p); el.style.borderColor='var(--border)'; el.style.background='var(--bg2)'; });
+    document.getElementById('btnCheckout').textContent='Select a plan above';
+    document.getElementById('btnCheckout').disabled=true;
+    showScreen('subscribe');
+  });
+  document.getElementById('btnGoActivate').addEventListener('click', function() {
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }\
+    showScreen('activate');
+  });
+  document.getElementById('btnGoPlaylist').addEventListener('click', function() {
+    if (!currentDeviceId) { setMsg('Please link a device first.', 'error'); return; }
+    cancelTransmissionTimer();
+    showScreen('playlist');
+  });
+  document.getElementById('btnActivateNow').addEventListener('click', activateDevice);
+  document.getElementById('btnCheckout').addEventListener('click', startCheckout);
+  document.getElementById('btnBackToDashboardC').addEventListener('click', function() { showScreen('dashboard'); });
+  document.getElementById('btnAddPlaylist').addEventListener('click', addPlaylist);
+  document.getElementById('btnBackToLink').addEventListener('click', function() { showScreen('link'); });
+  document.getElementById('btnBackToDashboardA').addEventListener('click', function() { showScreen('dashboard'); });
+  document.getElementById('btnBackToDashboardB').addEventListener('click', function() { cancelTransmissionTimer(); showScreen('dashboard'); });
+
+  // Startup
+  const paymentReturn = getQueryParam('payment');
+  const deviceFromPayment = normalizeDeviceId(getQueryParam('device_id') || getQueryParam('device'));
+  const planFromPayment = getQueryParam('plan');
+  const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
+  showScreen('link');
+  if (paymentReturn && deviceFromPayment) {
+    document.getElementById('device_id_link').value = deviceFromPayment;
+    linkDevice().then(function() {
+      if (paymentReturn === 'success') setMsg('✓ Payment successful! Your ' + (planFromPayment === 'lifetime' ? 'lifetime' : 'annual') + ' subscription is now active. Return to your TV.', 'success');
+      else if (paymentReturn === 'cancelled') setMsg('Payment was cancelled. Try again anytime.', 'error');
+    });
+  } else if (codeFromUrl) {
+    document.getElementById('device_id_link').value = codeFromUrl;
+    document.getElementById('device-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    linkDevice();
+  }
+</script>
+
+<!-- WhatsApp Support Button -->
+<a href="https://wa.me/15146167492" target="_blank"
+   style="position:fixed;bottom:24px;right:24px;background:#25d366;border-radius:50%;width:56px;height:56px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,0.4);z-index:999;text-decoration:none;transition:transform 0.2s;"
+   onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="white">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+</body>
+</html>
