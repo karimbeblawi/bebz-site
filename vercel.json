@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/arabic", "destination": "/arabic/index.html" },
+    { "source": "/arabic/", "destination": "/arabic/index.html" }
+  ]
+}
