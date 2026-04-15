@@ -775,6 +775,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  const APP_ID = 'bebztv';
+
   const SUPABASE_URL = 'https://qsmuvkwhrzbydncdiphu.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_GXoX0HbGSg4njByYEmRPAw_B7sRBLDI';
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -882,11 +884,11 @@
   function getQueryParam(name) { return new URLSearchParams(window.location.search).get(name) || ''; }
 
   async function getOrCreateDevice(deviceId) {
-    const r1 = await sb.from('devices').select('*').eq('device_id', deviceId).limit(1);
+    const r1 = await sb.from('devices').select('*').eq('device_id', deviceId).eq('app_id', APP_ID).limit(1);
     if (r1.error) throw new Error(r1.error.message);
     if (r1.data && r1.data.length > 0) return r1.data[0];
 
-    const r2 = await sb.from('devices').insert([{ device_id: deviceId, status: 'inactive' }]).select();
+    const r2 = await sb.from('devices').insert([{ device_id: deviceId, status: 'inactive', app_id: APP_ID }]).select();
     if (r2.error) throw new Error(r2.error.message);
     if (!r2.data || r2.data.length === 0) throw new Error('Could not create device record.');
     return r2.data[0];
@@ -930,7 +932,7 @@
       const resp = await fetch('/api/activate-trial', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ device_id: currentDeviceId }),
+        body: JSON.stringify({ device_id: currentDeviceId, app_id: APP_ID }),
       });
       const data = await resp.json();
       if (data.error) {
@@ -1046,6 +1048,7 @@
       password:      isM3u ? '' : password,
       consumed:      false,
       expires_at:    expires.toISOString(),
+      app_id:        APP_ID,
     };
 
     cancelTransmissionTimer();
@@ -1136,7 +1139,7 @@
       var resp = await fetch('/api/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ device_id: currentDeviceId, plan: selectedPlan }),
+        body: JSON.stringify({ device_id: currentDeviceId, plan: selectedPlan, app_id: APP_ID }),
       });
       var data = await resp.json();
       if (data.error) {
