@@ -620,11 +620,11 @@
   function getQueryParam(name) { return new URLSearchParams(window.location.search).get(name) || ''; }
 
   async function getOrCreateDevice(deviceId) {
-    const r1 = await sb.from('devices').select('*').eq('device_id', deviceId).limit(1);
+    const r1 = await sb.from('devices_arabic').select('*').eq('device_id', deviceId).limit(1);
     if (r1.error) throw new Error(r1.error.message);
     if (r1.data && r1.data.length > 0) return r1.data[0];
 
-    const r2 = await sb.from('devices').insert([{ device_id: deviceId, status: 'inactive', app_id: APP_ID }]).select();
+    const r2 = await sb.from('devices_arabic').insert([{ device_id: deviceId, status: 'inactive' }]).select();
     if (r2.error) throw new Error(r2.error.message);
     if (!r2.data || r2.data.length === 0) throw new Error('Could not create device record.');
     return r2.data[0];
@@ -709,7 +709,7 @@
 
     pickupPollInterval = setInterval(async function() {
       if (!pendingLinkId) return;
-      const r = await sb.from('device_links').select('id').eq('id', Number(pendingLinkId)).limit(1);
+      const r = await sb.from('device_links_arabic').select('id').eq('id', Number(pendingLinkId)).limit(1);
       if (!r.data || r.data.length === 0) {
         cancelTransmissionTimer();
         setMsg('✓ Playlist received by your TV!', 'success');
@@ -721,7 +721,7 @@
       clearInterval(countdownInterval);  countdownInterval  = null;
       clearInterval(pickupPollInterval); pickupPollInterval = null;
       if (pendingLinkId) {
-        await sb.from('device_links').delete().eq('id', Number(pendingLinkId));
+        await sb.from('device_links_arabic').delete().eq('id', Number(pendingLinkId));
         pendingLinkId = null;
       }
       setMsg('Transmission failed — TV did not respond. Make sure your TV is on and the app is open, then try again.', 'error');
