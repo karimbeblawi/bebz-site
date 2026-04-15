@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { device_id, playlist_name, playlist_url, username, password } = req.body;
+  const { device_id, playlist_name, playlist_url, username, password, app_id } = req.body;
 
   if (!device_id || !playlist_url) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -62,7 +62,8 @@ export default async function handler(req, res) {
     username:      encrypt(username),
     password:      encrypt(password),
     consumed: false,
-    expires_at: expires.toISOString()
+    expires_at: expires.toISOString(),
+    ...(app_id ? { app_id } : {})
   };
 
   const { data, error } = await supabase

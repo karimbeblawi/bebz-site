@@ -10,7 +10,7 @@ const TRIAL_DAYS = 30;
 module.exports = async function(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { device_id } = req.body || {};
+  const { device_id, app_id } = req.body || {};
   if (!device_id) return res.status(400).json({ error: 'device_id required' });
 
   // Fetch current device row
@@ -42,13 +42,16 @@ module.exports = async function(req, res) {
   expiry.setDate(expiry.getDate() + TRIAL_DAYS);
   const expiryIso = expiry.toISOString().split('T')[0];
 
+  const updatePayload = {
+    status: 'free_trial',
+    expiry_date: expiryIso,
+    trial_start_at: now.toISOString(),
+  };
+  if (app_id) updatePayload.app_id = app_id;
+
   const { error: updateError } = await sb
     .from('devices')
-    .update({
-      status: 'free_trial',
-      expiry_date: expiryIso,
-      trial_start_at: now.toISOString(),
-    })
+    .update(updatePayload)
     .eq('device_id', device_id);
 
   if (updateError) return res.status(500).json({ error: updateError.message });
