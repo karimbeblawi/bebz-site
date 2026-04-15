@@ -46,9 +46,11 @@ module.exports = async function(req, res) {
   var token     = req.query.token;
   var device_id = req.query.device_id;
   var plan      = req.query.plan;
+  var app_id    = req.query.app_id || 'bebztv';
+  var siteBase  = app_id === 'arabic_iptv' ? process.env.SITE_URL + '/arabic' : process.env.SITE_URL;
 
   if (!token || !device_id || !plan) {
-    return res.redirect(process.env.SITE_URL + '/?payment=cancelled');
+    return res.redirect(siteBase + '/?payment=cancelled');
   }
 
   try {
@@ -66,7 +68,7 @@ module.exports = async function(req, res) {
 
     if (capture.status !== 'COMPLETED') {
       console.error('PayPal capture failed:', JSON.stringify(capture));
-      return res.redirect(process.env.SITE_URL + '/?payment=cancelled');
+      return res.redirect(siteBase + '/?payment=cancelled');
     }
 
     // Extract custom_id for device_id and plan
@@ -85,8 +87,13 @@ module.exports = async function(req, res) {
     var paypalOrderId = capture.id;
     var payerId       = req.query.PayerID || null;
     var expiryDate    = finalPlan === 'annual' ? addOneYear(null) : null;
+    var finalAppId    = req.query.app_id || (purchaseUnit && purchaseUnit.custom_id ? (() => { try { return JSON.parse(purchaseUnit.custom_id).app_id || 'bebztv'; } catch(e) { return 'bebztv'; } })() : 'bebztv');
+    var devicesTable  = finalAppId === 'arabic_iptv' ? 'devices_arabic' : 'devices';
+    var redirectBase  = finalAppId === 'arabic_iptv'
+      ? process.env.SITE_URL + '/arabic'
+      : process.env.SITE_URL;
 
-    var result = await sb.from('devices').update({
+    var result = await sb.from(devicesTable).update({
       status:          'active',
       expiry_date:     expiryDate,
       paypal_order_id: paypalOrderId,
@@ -96,15 +103,15 @@ module.exports = async function(req, res) {
     if (result.error) {
       console.error('Supabase error:', result.error.message);
     } else {
-      console.log('Activated device:', finalDeviceId, 'plan:', finalPlan, 'expiry:', expiryDate);
+      console.log('Activated device:', finalDeviceId, 'plan:', finalPlan, 'expiry:', expiryDate, 'app:', finalAppId);
     }
 
     return res.redirect(
-      process.env.SITE_URL + '/?payment=success&plan=' + finalPlan + '&device_id=' + encodeURIComponent(finalDeviceId)
+      redirectBase + '/?payment=success&plan=' + finalPlan + '&device_id=' + encodeURIComponent(finalDeviceId)
     );
 
   } catch(err) {
     console.error('Capture error:', err);
-    return res.redirect(process.env.SITE_URL + '/?payment=cancelled');
+    return res.redirect(siteBase + '/?payment=cancelled');
   }
 };

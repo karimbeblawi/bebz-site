@@ -22,6 +22,10 @@ module.exports = async function(req, res) {
 
   var device_id = req.body.device_id;
   var plan      = req.body.plan;
+  var app_id    = req.body.app_id || 'bebztv';
+  var returnBase = app_id === 'arabic_iptv'
+    ? process.env.SITE_URL + '/arabic'
+    : process.env.SITE_URL;
 
   console.log('create-checkout called: device_id=' + device_id + ' plan=' + plan);
   console.log('ENV CHECK: PAYPAL_CLIENT_ID=' + (process.env.PAYPAL_CLIENT_ID ? 'SET' : 'MISSING'));
@@ -79,7 +83,7 @@ module.exports = async function(req, res) {
         purchase_units: [{
           reference_id: device_id + '_' + plan,
           description: planConfig.description,
-          custom_id: JSON.stringify({ device_id: device_id, plan: plan }),
+          custom_id: JSON.stringify({ device_id: device_id, plan: plan, app_id: app_id }),
           amount: {
             currency_code: planConfig.currency,
             value: planConfig.amount,
@@ -105,8 +109,8 @@ module.exports = async function(req, res) {
           brand_name: 'BebzTV',
           landing_page: 'NO_PREFERENCE',
           user_action: 'PAY_NOW',
-          return_url: process.env.SITE_URL + '/api/paypal-capture?device_id=' + encodeURIComponent(device_id) + '&plan=' + plan,
-          cancel_url: process.env.SITE_URL + '/?payment=cancelled'
+          return_url: process.env.SITE_URL + '/api/paypal-capture?device_id=' + encodeURIComponent(device_id) + '&plan=' + plan + '&app_id=' + app_id,
+          cancel_url: returnBase + '/?payment=cancelled'
         }
       })
     });
