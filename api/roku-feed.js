@@ -67,7 +67,7 @@ function buildFeed(channels) {
   const liveFeeds = channels.map((ch, idx) => {
     const id = `arabic-iptv-bebz-${slugify(ch.name)}-${idx}`;
     const title = ch.displayName || ch.name;
-    const thumbnail = ch.logo && ch.logo.startsWith('http')
+    const thumbnail = ch.logo && ch.logo.startsWith('https')
       ? ch.logo
       : 'https://bebz.tv/arabic/logo.png';
 
@@ -78,7 +78,7 @@ function buildFeed(channels) {
         dateAdded: now,
         videos: [
           {
-            url: `https://bebz.tv/arabic/?channel=${encodeURIComponent(ch.name)}`,
+            url: ch.url,
             quality: 'HD',
             videoType: 'HLS'
           }
