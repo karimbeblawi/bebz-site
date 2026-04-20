@@ -1,5 +1,6 @@
 // api/roku-feed.js
-// Generates a Roku Search Feed 2.0 JSON from the Arabic IPTV M3U
+// Roku Search Feed 2.0 - live channels submitted as shortFormVideos
+// liveFeeds is Direct Publisher only - Search Feed uses movies/shortFormVideos
 
 const https = require('https');
 
@@ -53,7 +54,7 @@ function slugify(str) {
 function buildFeed(channels) {
   const now = new Date().toISOString();
 
-  const liveFeeds = channels.map((ch, idx) => {
+  const shortFormVideos = channels.map((ch, idx) => {
     const title = ch.displayName || ch.name;
     const id = `bebz-arabic-${idx}-${slugify(ch.name)}`;
     const thumbnail = ch.logo && ch.logo.startsWith('https')
@@ -69,9 +70,11 @@ function buildFeed(channels) {
           {
             url: ch.url,
             quality: 'FHD',
-            videoType: 'HLS'
+            videoType: 'HLS',
+            duration: 86400
           }
         ],
+        duration: 86400,
         language: 'en-US'
       },
       thumbnail,
@@ -87,7 +90,7 @@ function buildFeed(channels) {
     providerName: 'Bebz Arabic IPTV Player',
     lastUpdated: now,
     language: 'en-US',
-    liveFeeds
+    shortFormVideos
   };
 }
 
