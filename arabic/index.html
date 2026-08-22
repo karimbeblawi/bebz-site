@@ -603,14 +603,15 @@
     applyStatusPill(document.getElementById('subscribeStatus'), status);
 
     const alreadyActive = (status === 'active' || status === 'free_trial');
+    const isExpired = (status === 'expired');
     const noExpiry = (!expiry);
     const isLifetime = (status === 'active' && noExpiry);
     const btnGoAct = document.getElementById('btnGoActivate');
-    btnGoAct.textContent = alreadyActive ? 'Free Trial Started' : 'Start Free Trial';
-    btnGoAct.disabled = alreadyActive;
+    btnGoAct.textContent = alreadyActive ? 'Free Trial Started' : isExpired ? 'Trial Ended' : 'Start Free Trial';
+    btnGoAct.disabled = alreadyActive || isExpired;
     const btnGoSub = document.getElementById('btnGoSubscribe');
     if (isLifetime) { btnGoSub.textContent = 'Lifetime ✓'; btnGoSub.disabled = true; }
-    else { btnGoSub.textContent = alreadyActive ? 'Renew / Upgrade' : 'Subscribe'; btnGoSub.disabled = false; }
+    else { btnGoSub.textContent = (alreadyActive || isExpired) ? 'Renew / Upgrade' : 'Subscribe'; btnGoSub.disabled = false; }
     const btnAct = document.getElementById('btnActivateNow');
     if (alreadyActive) { btnAct.textContent = 'Already Active'; btnAct.disabled = true; }
     else { btnAct.textContent = 'Start 30-Day Free Trial'; btnAct.disabled = false; }
