@@ -51,6 +51,31 @@ export default async function handler(req, res) {
 
   const linksTable = (app_id === 'arabic_iptv') ? 'device_links_arabic' : 'device_links';
 
+  // Refuse new playlist submissions for devices that have been marked
+  // inactive. A device with no row at all yet (a genuinely new device
+  // being linked for the first time) is unaffected -- this only blocks
+  // devices that already exist and are specifically inactive.
+  const devicesTable = (app_id === 'arabic_iptv') ? 'devices_arabic' : 'devices';
+
+  const { data: deviceRows, error: deviceError } = await supabase
+    .from(devicesTable)
+    .select('status')
+    .eq('device_id', device_id)
+    .limit(1);
+
+  if (deviceError) {
+    return res.status(500).json({ error: deviceError.message });
+  }
+
+  if (deviceRows && deviceRows.length > 0) {
+    const currentStatus = (deviceRows[0].status || '').toLowerCase();
+    if (currentStatus === 'inactive') {
+      return res.status(403).json({
+        error: 'This device is inactive and cannot add a new playlist. Please contact support to reactivate it.'
+      });
+    }
+  }
+
   const expires = new Date();
   expires.setMinutes(expires.getMinutes() + 10);
 
