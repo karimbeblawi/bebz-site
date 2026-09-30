@@ -21,13 +21,13 @@ module.exports = async function(req, res) {
 
   if (error) return res.status(500).json({ error: error.message });
 
-  // If no record exists, create one
   if (!data || data.length === 0) {
-    const { error: insertError } = await sb.from(devicesTable).insert([{ device_id, status: 'inactive' }]);
-    if (insertError) return res.status(500).json({ error: insertError.message });
+    return res.status(404).json({
+      error: 'This Device ID was not found. Open the app on your Roku first, then enter the Device ID shown on the TV.'
+    });
   }
 
-  const device = data && data.length > 0 ? data[0] : { status: 'inactive', expiry_date: null, trial_start_at: null };
+  const device = data[0];
   const status = device.status;
 
   // Never downgrade an active/paid device

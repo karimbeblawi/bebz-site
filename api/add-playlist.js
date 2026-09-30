@@ -51,10 +51,9 @@ export default async function handler(req, res) {
 
   const linksTable = (app_id === 'arabic_iptv') ? 'device_links_arabic' : 'device_links';
 
-  // Refuse new playlist submissions for devices that have been marked
-  // inactive. A device with no row at all yet (a genuinely new device
-  // being linked for the first time) is unaffected -- this only blocks
-  // devices that already exist and are specifically inactive.
+  // Playlist handoff is only for Device IDs the app already registered.
+  // Inactive means support/deactivation — not "never paid"; those rows
+  // still exist after first launch.
   const devicesTable = (app_id === 'arabic_iptv') ? 'devices_arabic' : 'devices';
 
   const { data: deviceRows, error: deviceError } = await supabase
@@ -67,13 +66,17 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: deviceError.message });
   }
 
-  if (deviceRows && deviceRows.length > 0) {
-    const currentStatus = (deviceRows[0].status || '').toLowerCase();
-    if (currentStatus === 'inactive') {
-      return res.status(403).json({
-        error: 'This device is inactive and cannot add a new playlist. Please contact support to reactivate it.'
-      });
-    }
+  if (!deviceRows || deviceRows.length === 0) {
+    return res.status(404).json({
+      error: 'This Device ID was not found. Open the app on your Roku first, then enter the Device ID shown on the TV.'
+    });
+  }
+
+  const currentStatus = (deviceRows[0].status || '').toLowerCase();
+  if (currentStatus === 'inactive') {
+    return res.status(403).json({
+      error: 'This device is inactive and cannot add a new playlist. Please contact support to reactivate it.'
+    });
   }
 
   const expires = new Date();
