@@ -620,11 +620,29 @@
   function normalizeDeviceId(v) { return (v || '').trim().toUpperCase(); }
   function getQueryParam(name) { return new URLSearchParams(window.location.search).get(name) || ''; }
 
+  async function lookupDevice(deviceId) {
+    const resp = await fetch('/api/lookup-device', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ device_id: deviceId, app_id: APP_ID })
+    });
+    return resp.json();
+  }
+
   async function getExistingDevice(deviceId) {
-    const r1 = await sb.from('devices_arabic').select('*').eq('device_id', deviceId).limit(1);
-    if (r1.error) throw new Error(r1.error.message);
-    if (r1.data && r1.data.length > 0) return r1.data[0];
-    throw new Error('This Device ID was not found. Open the app on your Roku first, then enter the Device ID shown on the TV exactly as it appears.');
+    const deadline = Date.now() + 90000;
+    while (true) {
+      const data = await lookupDevice(deviceId);
+      if (data.found && data.device) return data.device;
+      if (data.tv_online) {
+        return data.device || { device_id: deviceId, status: '', expiry_date: null };
+      }
+      if (Date.now() > deadline) {
+        throw new Error(data.error || 'Open the app on your Roku, leave the Device ID / QR screen on, then try again.');
+      }
+      setMsg('Waiting for your TV. Leave the Device ID screen open on the Roku…');
+      await new Promise(function(resolve) { setTimeout(resolve, 3000); });
+    }
   }
 
   async function linkDevice() {
@@ -640,6 +658,9 @@
       currentDeviceRow = row;
       populateDashboard(row);
       showScreen('dashboard');
+      if (!row.status) {
+        setMsg('TV detected. You can start a free trial or subscribe. Keep the app open on the TV until that is done.', 'success');
+      }
     } catch (err) {
       setMsg('Error: ' + err.message, 'error');
     } finally {

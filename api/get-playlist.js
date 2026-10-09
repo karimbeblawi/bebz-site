@@ -52,9 +52,23 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
-  const { device_id, app_id } = req.query;
+  const { device_id, app_id, roku_client_id, build, app_language } = req.query;
   if (!device_id) {
     return res.status(400).json({ error: 'Missing device_id' });
+  }
+  const presencePayload = {
+    device_id: String(device_id).trim().toUpperCase(),
+    app_id: app_id === 'arabic_iptv' ? 'arabic_iptv' : 'bebztv',
+    seen_at: new Date().toISOString()
+  };
+  if (roku_client_id) presencePayload.roku_client_id = String(roku_client_id);
+  if (build) presencePayload.build = String(build);
+  if (app_language) presencePayload.app_language = String(app_language);
+  const presenceResult = await supabase
+    .from('device_presence')
+    .upsert(presencePayload, { onConflict: 'device_id,app_id' });
+  if (presenceResult.error) {
+    console.error('device_presence upsert:', presenceResult.error.message);
   }
   const linksTable = (app_id === 'arabic_iptv') ? 'device_links_arabic' : 'device_links';
   const { data, error } = await supabase

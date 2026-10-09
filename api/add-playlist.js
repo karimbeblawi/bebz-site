@@ -68,7 +68,7 @@ export default async function handler(req, res) {
 
   if (!deviceRows || deviceRows.length === 0) {
     return res.status(404).json({
-      error: 'This Device ID was not found. Open the app on your Roku first, then enter the Device ID shown on the TV.'
+      error: 'Activate this device first (free trial or subscription), then add a playlist.'
     });
   }
 

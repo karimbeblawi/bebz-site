@@ -7,6 +7,7 @@ var fetch = require('node-fetch');
 // =============================================================
 
 const { createClient } = require('@supabase/supabase-js');
+const presence = require('./_lib/devicePresence');
 
 const sb = createClient(
   process.env.SUPABASE_URL,
@@ -93,15 +94,26 @@ module.exports = async function(req, res) {
       ? process.env.SITE_URL + '/arabic'
       : process.env.SITE_URL;
 
-    var result = await sb.from(devicesTable).update({
+    var paidPayload = {
       status:          'active',
       expiry_date:     expiryDate,
       paypal_order_id: paypalOrderId,
       paypal_payer_id: payerId
-    }).eq('device_id', finalDeviceId);
-
-    if (result.error) {
-      console.error('Supabase error:', result.error.message);
+    };
+    var updated = await sb.from(devicesTable).update(paidPayload).eq('device_id', finalDeviceId).select('device_id');
+    if (updated.error) {
+      console.error('Supabase error:', updated.error.message);
+    } else if (!updated.data || updated.data.length === 0) {
+      paidPayload.device_id = finalDeviceId;
+      if (finalAppId) paidPayload.app_id = finalAppId;
+      var live = await presence.getFreshPresence(sb, finalDeviceId, finalAppId);
+      Object.assign(paidPayload, presence.presenceExtras(live));
+      var inserted = await sb.from(devicesTable).insert(paidPayload);
+      if (inserted.error) {
+        console.error('Supabase insert error:', inserted.error.message);
+      } else {
+        console.log('Inserted paid device:', finalDeviceId, 'plan:', finalPlan, 'expiry:', expiryDate, 'app:', finalAppId);
+      }
     } else {
       console.log('Activated device:', finalDeviceId, 'plan:', finalPlan, 'expiry:', expiryDate, 'app:', finalAppId);
     }

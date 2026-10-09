@@ -1,5 +1,6 @@
 var fetch = require('node-fetch');
 const { createClient } = require('@supabase/supabase-js');
+const presence = require('./_lib/devicePresence');
 
 const sb = createClient(
   process.env.SUPABASE_URL,
@@ -48,15 +49,9 @@ module.exports = async function(req, res) {
     return res.status(400).json({ error: 'Invalid plan' });
   }
 
-  var devicesTable = app_id === 'arabic_iptv' ? 'devices_arabic' : 'devices';
-  var existing = await sb.from(devicesTable).select('device_id').eq('device_id', device_id).limit(1);
-  if (existing.error) {
-    return res.status(500).json({ error: existing.error.message });
-  }
-  if (!existing.data || existing.data.length === 0) {
-    return res.status(404).json({
-      error: 'This Device ID was not found. Open the app on your Roku first, then enter the Device ID shown on the TV.'
-    });
+  var gate = await presence.requireExistingOrLinked(sb, device_id, app_id);
+  if (!gate.ok) {
+    return res.status(gate.status).json({ error: gate.error, code: gate.code });
   }
 
   var clientId = process.env.PAYPAL_CLIENT_ID;

@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const presence = require('./_lib/devicePresence');
 
 const sb = createClient(
   process.env.SUPABASE_URL,
@@ -10,34 +11,22 @@ const TRIAL_DAYS = 30;
 module.exports = async function(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { device_id, app_id } = req.body || {};
+  const app_id = (req.body || {}).app_id;
+  const device_id = presence.normalizeDeviceId((req.body || {}).device_id);
   if (!device_id) return res.status(400).json({ error: 'device_id required' });
 
-  const devicesTable = (app_id === 'arabic_iptv') ? 'devices_arabic' : 'devices';
+  const devicesTable = presence.devicesTable(app_id);
+  const gate = await presence.requireExistingOrLinked(sb, device_id, app_id);
+  if (!gate.ok) return res.status(gate.status).json({ error: gate.error, code: gate.code });
 
-  // Fetch current device row
-  let query = sb.from(devicesTable).select('status, expiry_date, trial_start_at').eq('device_id', device_id).limit(1);
-  const { data, error } = await query;
+  const device = gate.device;
+  const status = device ? device.status : '';
 
-  if (error) return res.status(500).json({ error: error.message });
-
-  if (!data || data.length === 0) {
-    return res.status(404).json({
-      error: 'This Device ID was not found. Open the app on your Roku first, then enter the Device ID shown on the TV.'
-    });
-  }
-
-  const device = data[0];
-  const status = device.status;
-
-  // Never downgrade an active/paid device
   if (status === 'active' || status === 'free_trial') {
     return res.status(400).json({ error: 'Device is already active' });
   }
 
-  // Block re-activation if device has already had a trial
-  // trial_start_at is set when the first trial was granted
-  if (device.trial_start_at !== null) {
+  if (device && device.trial_start_at !== null) {
     return res.status(400).json({ error: 'This device has already used its free trial' });
   }
 
@@ -46,17 +35,21 @@ module.exports = async function(req, res) {
   expiry.setDate(expiry.getDate() + TRIAL_DAYS);
   const expiryIso = expiry.toISOString().split('T')[0];
 
-  const updatePayload = {
+  const payload = Object.assign({
     status: 'free_trial',
     expiry_date: expiryIso,
-    trial_start_at: now.toISOString(),
-  };
-  if (app_id) updatePayload.app_id = app_id;
+    trial_start_at: now.toISOString()
+  }, presence.presenceExtras(gate.presence));
+  if (app_id) payload.app_id = presence.normalizeAppId(app_id);
 
-  let updateQuery = sb.from(devicesTable).update(updatePayload).eq('device_id', device_id);
-  const { error: updateError } = await updateQuery;
-
-  if (updateError) return res.status(500).json({ error: updateError.message });
+  if (device) {
+    const { error: updateError } = await sb.from(devicesTable).update(payload).eq('device_id', device_id);
+    if (updateError) return res.status(500).json({ error: updateError.message });
+  } else {
+    payload.device_id = device_id;
+    const { error: insertError } = await sb.from(devicesTable).insert(payload);
+    if (insertError) return res.status(500).json({ error: insertError.message });
+  }
 
   return res.status(200).json({ status: 'free_trial', expiry_date: expiryIso });
 };
