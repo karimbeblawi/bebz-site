@@ -2,9 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Cache-Control" content="no-store" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bebz TV — Media Player for Roku</title>
+  <title>IPTV Roku Player | Bebz TV — Xtream Codes &amp; M3U</title>
+  <meta name="description" content="IPTV Roku player for your own playlist. Bebz TV plays Xtream Codes and M3U on Roku. 30-day free trial. We do not provide IPTV content." />
+  <meta name="keywords" content="IPTV Roku player, Roku IPTV player, IPTV player for Roku, Xtream Codes Roku, M3U Roku player, Bebz TV" />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://bebz.tv/" />
+  <link rel="icon" href="https://bebz.tv/logo.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Bebz TV" />
+  <meta property="og:url" content="https://bebz.tv/" />
+  <meta property="og:title" content="IPTV Roku Player | Bebz TV" />
+  <meta property="og:description" content="IPTV player for Roku. Connect your Xtream or M3U playlist. 30-day free trial. No content included." />
+  <meta property="og:image" content="https://bebz.tv/Screenshot1.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@bebzTV" />
+  <meta name="twitter:title" content="IPTV Roku Player | Bebz TV" />
+  <meta name="twitter:description" content="IPTV player for Roku. Your Xtream or M3U playlist. Free 30-day trial." />
+  <meta name="twitter:image" content="https://bebz.tv/Screenshot1.jpg" />
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[
+    {"@type":"Organization","name":"Bebz TV","url":"https://bebz.tv/","logo":"https://bebz.tv/logo.png","email":"support@bebz.tv","address":{"@type":"PostalAddress","addressLocality":"Montreal","addressCountry":"CA"},"sameAs":["https://x.com/bebzTV"]},
+    {"@type":"SoftwareApplication","name":"Bebz TV","alternateName":["IPTV Roku Player","Roku IPTV Player","IPTV player for Roku"],"applicationCategory":"MultimediaApplication","operatingSystem":"Roku","url":"https://bebz.tv/","description":"IPTV Roku player for user-provided Xtream Codes and M3U playlists. Does not include IPTV content.","offers":[{"@type":"Offer","price":"8.99","priceCurrency":"USD","name":"Annual"},{"@type":"Offer","price":"19.99","priceCurrency":"USD","name":"Lifetime"}]},
+    {"@type":"FAQPage","mainEntity":[
+      {"@type":"Question","name":"What is the best IPTV player for Roku?","acceptedAnswer":{"@type":"Answer","text":"The best IPTV player for Roku plays your Xtream Codes or M3U playlist on the TV, offers a trial, and does not sell channels. Bebz TV is an IPTV Roku player built for that. See https://bebz.tv/best-iptv-player-for-roku.html"}},
+      {"@type":"Question","name":"What is an IPTV Roku player?","acceptedAnswer":{"@type":"Answer","text":"An IPTV Roku player is an app on your Roku that plays your IPTV playlist (Xtream Codes or M3U). Bebz TV is that player. It does not sell IPTV content."}},
+      {"@type":"Question","name":"Does Bebz TV include movies or live channels?","acceptedAnswer":{"@type":"Answer","text":"No. Bebz TV is a media player only. You connect your own Xtream Codes or M3U playlist."}},
+      {"@type":"Question","name":"Is there a free trial?","acceptedAnswer":{"@type":"Answer","text":"Yes. 30 days, no credit card required."}},
+      {"@type":"Question","name":"Where do I install Bebz TV?","acceptedAnswer":{"@type":"Answer","text":"Install free from the Roku Channel Store, then activate on bebz.tv."}}
+    ]}
+  ]}
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
@@ -436,7 +464,7 @@
       margin-bottom: 20px;
     }
 
-    h1.card-logo {
+    p.card-logo {
       font-family: 'DM Sans', sans-serif;
       font-weight: 800;
       font-size: 26px;
@@ -444,7 +472,13 @@
       margin-bottom: 8px;
     }
 
-    h1.card-logo span { color: var(--accent2); }
+    p.card-logo span { color: var(--accent2); }
+
+    .faq { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 20px 24px 80px; }
+    .faq h2 { font-family: 'DM Sans', sans-serif; font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 28px; }
+    .faq details { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; }
+    .faq summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+    .faq details p { color: var(--muted); font-size: 14px; margin-top: 10px; line-height: 1.6; }
 
     /* ── FOOTER ── */
     footer {
@@ -527,9 +561,12 @@
   <ul class="nav-links">
     <li><a href="#features">Features</a></li>
     <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="/best-iptv-player-for-roku.html">Best IPTV for Roku</a></li>
     <li><a href="/about.html">About</a></li>
     <li><a href="/contact.html">Contact</a></li>
     <li><a href="#device-section">Manage Device</a></li>
+    <li><a href="/arabic/">Arabic IPTV</a></li>
     <li><a href="mailto:support@bebz.tv">Support</a></li>
   </ul>
 </nav>
@@ -538,9 +575,9 @@
 <section class="hero">
   <div class="hero-badge">Now available on Roku</div>
 
-  <h1>Your content,<br><span>beautifully played.</span></h1>
+  <h1>IPTV Roku player for <span>your own playlist</span></h1>
 
-  <p>Bebz TV is a fast, elegant media player for Roku. Connect your own personal media subscription and instantly enjoy live TV, movies, and series — with full Arabic support.</p>
+  <p>Bebz TV is an IPTV player for Roku. Connect your Xtream Codes or M3U playlist and watch live TV, movies, and series on your Roku. We do not provide IPTV content.</p>
 
   <!-- Checkmarks -->
   <div style="display:inline-flex;flex-direction:column;gap:10px;margin-bottom:36px;text-align:left;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:12px;padding:20px 28px;">
@@ -562,6 +599,7 @@
 
 <!-- FEATURES -->
 <section class="features" id="features">
+  <h2 class="features-heading" style="grid-column:1/-1;font-family:'DM Sans',sans-serif;font-size:32px;font-weight:800;text-align:center;margin-bottom:8px;">IPTV Roku player features</h2>
   <div class="feature-card">
     <div class="feature-icon">📡</div>
     <h3>Universal Compatibility</h3>
@@ -627,7 +665,7 @@
 
   <!-- SCREEN: Link -->
   <section id="screen-link">
-    <h1 class="card-logo">Bebz<span>TV</span></h1>
+    <p class="card-logo">Bebz<span>TV</span></p>
     <p class="small-note" style="margin-bottom:22px;">Link your device to activate it or add a playlist.</p>
 
     <label class="field-label" for="device_id_link">Device ID</label>
@@ -755,6 +793,34 @@
 
   <div id="msg"></div>
 </div>
+</section>
+
+<section class="faq" id="faq">
+  <h2>IPTV Roku player FAQ</h2>
+  <details open>
+    <summary>What is the best IPTV player for Roku?</summary>
+    <p>Look for an IPTV player that runs on Roku, plays your Xtream or M3U playlist, has a trial, and does not sell TV channels. <a href="/best-iptv-player-for-roku.html">Bebz TV’s guide</a> covers that. Bebz TV is that kind of IPTV Roku player.</p>
+  </details>
+  <details>
+    <summary>What is an IPTV Roku player?</summary>
+    <p>An IPTV Roku player is an app on your Roku that plays your IPTV playlist (Xtream Codes or M3U). Bebz TV is that player. It does not sell or host IPTV content.</p>
+  </details>
+  <details>
+    <summary>Does Bebz TV include movies or live channels?</summary>
+    <p>No. Bebz TV is a media player only. You connect your own Xtream Codes login or M3U playlist from a provider you already have.</p>
+  </details>
+  <details>
+    <summary>Is there a free trial?</summary>
+    <p>Yes. 30 days, no credit card. Install from the Roku Channel Store, then activate on this site with the Device ID on your TV.</p>
+  </details>
+  <details>
+    <summary>What playlists work?</summary>
+    <p>Xtream Codes API and M3U / M3U8 playlist URLs. You can add more than one playlist on the same device.</p>
+  </details>
+  <details>
+    <summary>How much does it cost after the trial?</summary>
+    <p>$8.99 per year or $19.99 lifetime. The Roku channel install is free.</p>
+  </details>
 </section>
 
 <!-- FOOTER -->
@@ -1207,6 +1273,10 @@
   const deviceFromPayment = normalizeDeviceId(getQueryParam('device_id') || getQueryParam('device'));
   const planFromPayment = getQueryParam('plan');
   const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
+  if (codeFromUrl || paymentReturn) {
+    var robots = document.querySelector('meta[name="robots"]');
+    if (robots) robots.setAttribute('content', 'noindex,nofollow');
+  }
   showScreen('link');
   if (paymentReturn && deviceFromPayment) {
     document.getElementById('device_id_link').value = deviceFromPayment;
@@ -1222,7 +1292,7 @@
 </script>
 
 <!-- WhatsApp Support Button -->
-<a href="https://wa.me/15146167492" target="_blank" 
+<a href="https://wa.me/15146167492" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp support"> 
    style="position:fixed;bottom:24px;right:24px;background:#25d366;border-radius:50%;width:56px;height:56px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,0.4);z-index:999;text-decoration:none;transition:transform 0.2s;"
    onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="white">

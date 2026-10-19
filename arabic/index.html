@@ -2,9 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Cache-Control" content="no-store" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bebz Arabic IPTV Player — Media Player for Roku</title>
+  <title>Arabic IPTV Roku Player | Bebz — Free Channels + Your Playlist</title>
+  <meta name="description" content="Arabic IPTV Roku player: 200+ free Arabic live channels, RTL Arabic UI, plus your Xtream or M3U playlist. 30-day free trial." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://bebz.tv/arabic/" />
+  <link rel="icon" href="https://bebz.tv/arabic/logo.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://bebz.tv/arabic/" />
+  <meta property="og:title" content="Arabic IPTV Roku Player | Bebz" />
+  <meta property="og:description" content="Arabic IPTV player for Roku. Free live channels plus your own playlist. 30-day free trial." />
+  <meta property="og:image" content="https://bebz.tv/Screenshot1.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@bebzTV" />
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Bebz Arabic IPTV Player","alternateName":["Arabic IPTV Roku Player","IPTV player for Roku"],"applicationCategory":"MultimediaApplication","operatingSystem":"Roku","url":"https://bebz.tv/arabic/","description":"Arabic IPTV Roku player with free Arabic live channels and optional user playlists.","offers":[{"@type":"Offer","price":"8.99","priceCurrency":"USD","name":"Annual"},{"@type":"Offer","price":"19.99","priceCurrency":"USD","name":"Lifetime"}]}
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
@@ -236,8 +249,13 @@
     .divider-line { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
 
     h2.card-title { font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 20px; }
-    h1.card-logo { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 22px; text-align: center; margin-bottom: 8px; }
-    h1.card-logo span { color: var(--accent2); }
+    p.card-logo { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 22px; text-align: center; margin-bottom: 8px; }
+    p.card-logo span { color: var(--accent2); }
+    .faq { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 20px 24px 80px; }
+    .faq h2 { font-family: 'DM Sans', sans-serif; font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 28px; }
+    .faq details { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; }
+    .faq summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+    .faq details p { color: var(--muted); font-size: 14px; margin-top: 10px; line-height: 1.6; }
 
     footer {
       position: relative; z-index: 1;
@@ -290,6 +308,7 @@
     <li><a href="/about.html">About</a></li>
     <li><a href="/contact.html">Contact</a></li>
     <li><a href="#device-section">Manage Device</a></li>
+    <li><a href="/">Bebz TV</a></li>
     <li><a href="mailto:support@bebz.tv">Support</a></li>
   </ul>
 </nav>
@@ -298,9 +317,9 @@
 <section class="hero">
   <div class="hero-badge">Now available on Roku</div>
 
-  <h1>Arabic IPTV,<br><span>beautifully played.</span></h1>
+  <h1>Arabic IPTV Roku player — <span>free live channels + your playlist</span></h1>
 
-  <p>Bebz Arabic IPTV Player is a fast, elegant media player for Roku built for Arabic-speaking audiences. Full right-to-left Arabic text, live TV, movies, and series — plus 200+ free Arabic live channels included.</p>
+  <p>Bebz is an Arabic IPTV player for Roku. Full right-to-left Arabic text, live TV, movies, and series — plus 200+ free Arabic live channels included. Add your own IPTV playlist if you have one.</p>
 
   <div style="display:inline-flex;flex-direction:column;gap:10px;margin-bottom:36px;text-align:left;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:12px;padding:20px 28px;">
     <div style="display:flex;align-items:center;gap:10px;font-size:15px;color:#c9d3e8;"><span style="color:#4ade80;font-size:18px;">✅</span><span><strong style="color:#f0f4ff;">Try Before You Buy</strong> — Full 30-day free trial, no credit card required</span></div>
@@ -317,6 +336,7 @@
 
 <!-- FEATURES -->
 <section class="features" id="features">
+  <h2 style="grid-column:1/-1;font-family:'DM Sans',sans-serif;font-size:32px;font-weight:800;text-align:center;margin-bottom:8px;">Arabic IPTV player features</h2>
   <div class="feature-card">
     <div class="feature-icon">🌍</div>
     <h3>Full Arabic Support</h3>
@@ -381,7 +401,7 @@
 
   <!-- SCREEN: Link -->
   <section id="screen-link">
-    <h1 class="card-logo">Bebz <span>Arabic IPTV</span></h1>
+    <p class="card-logo">Bebz <span>Arabic IPTV</span></p>
     <p class="small-note" style="margin-bottom:22px;">Link your device to activate it or add a playlist.</p>
 
     <label class="field-label" for="device_id_link">Device ID</label>
@@ -495,6 +515,26 @@
 
   <div id="msg"></div>
 </div>
+</section>
+
+<section class="faq" id="faq">
+  <h2>Arabic IPTV Roku player FAQ</h2>
+  <details open>
+    <summary>What is an Arabic IPTV Roku player?</summary>
+    <p>It is an IPTV player on Roku for Arabic live TV and playlists. Bebz plays 200+ free Arabic channels and your own Xtream or M3U IPTV playlist.</p>
+  </details>
+  <details>
+    <summary>Are the 200+ Arabic channels free?</summary>
+    <p>Yes. They are included in the app at no extra cost. You can also connect your own Xtream or M3U playlist.</p>
+  </details>
+  <details>
+    <summary>Do you sell IPTV subscriptions?</summary>
+    <p>No. Paid movies, series, and extra live TV come from a playlist you already have. The app is the player.</p>
+  </details>
+  <details>
+    <summary>Is there a free trial?</summary>
+    <p>Yes. 30 days, no credit card. Install from the Roku Channel Store and activate on this page.</p>
+  </details>
 </section>
 
 <!-- FOOTER -->
@@ -930,6 +970,10 @@
   const deviceFromPayment = normalizeDeviceId(getQueryParam('device_id') || getQueryParam('device'));
   const planFromPayment = getQueryParam('plan');
   const codeFromUrl = normalizeDeviceId(getQueryParam('code'));
+  if (codeFromUrl || paymentReturn) {
+    var robots = document.querySelector('meta[name="robots"]');
+    if (robots) robots.setAttribute('content', 'noindex,nofollow');
+  }
   showScreen('link');
   if (paymentReturn && deviceFromPayment) {
     document.getElementById('device_id_link').value = deviceFromPayment;
@@ -945,7 +989,7 @@
 </script>
 
 <!-- WhatsApp Support Button -->
-<a href="https://wa.me/15146167492" target="_blank"
+<a href="https://wa.me/15146167492" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp support">
    style="position:fixed;bottom:24px;right:24px;background:#25d366;border-radius:50%;width:56px;height:56px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,0.4);z-index:999;text-decoration:none;transition:transform 0.2s;"
    onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="white">
