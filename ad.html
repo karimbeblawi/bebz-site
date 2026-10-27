@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPTV Roku Player | Bebz TV — Xtream Codes &amp; M3U</title>
+  <meta name="description" content="IPTV Roku player for your own playlist. Bebz TV plays Xtream Codes and M3U on Roku. 30-day free trial. We do not provide IPTV content." />
+  <meta name="keywords" content="IPTV Roku player, Roku IPTV player, IPTV player for Roku, Xtream Codes Roku, M3U Roku player, Bebz TV" />
+  <meta name="robots" content="noindex,follow" />
+  <link rel="canonical" href="https://bebz.tv/ad" />
+  <link rel="icon" href="https://bebz.tv/logo.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Bebz TV" />
+  <meta property="og:url" content="https://bebz.tv/ad" />
+  <meta property="og:title" content="BEBZ TV — Best IPTV Roku player for your own playlist" />
+  <meta property="og:description" content="30-day free trial, no credit card required. Xtream Codes or M3U playlist. Watch live TV, movies, and series." />
+  <meta property="og:image" content="https://bebz.tv/og-ad.png" />
+  <meta property="og:image:width" content="1440" />
+  <meta property="og:image:height" content="1100" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@bebzTV" />
+  <meta name="twitter:title" content="BEBZ TV — Best IPTV Roku player for your own playlist" />
+  <meta name="twitter:description" content="30-day free trial, no credit card required. Xtream Codes or M3U playlist. Watch live TV, movies, and series." />
+  <meta name="twitter:image" content="https://bebz.tv/og-ad.png" />
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[
+    {"@type":"Organization","name":"Bebz TV","url":"https://bebz.tv/","logo":"https://bebz.tv/logo.png","email":"support@bebz.tv","address":{"@type":"PostalAddress","addressLocality":"Montreal","addressCountry":"CA"},"sameAs":["https://x.com/bebzTV"]},
+    {"@type":"SoftwareApplication","name":"Bebz TV","alternateName":["IPTV Roku Player","Roku IPTV Player","IPTV player for Roku"],"applicationCategory":"MultimediaApplication","operatingSystem":"Roku","url":"https://bebz.tv/","description":"IPTV Roku player for user-provided Xtream Codes and M3U playlists. Does not include IPTV content.","offers":[{"@type":"Offer","price":"8.99","priceCurrency":"USD","name":"Annual"},{"@type":"Offer","price":"19.99","priceCurrency":"USD","name":"Lifetime"}]},
+    {"@type":"FAQPage","mainEntity":[
+      {"@type":"Question","name":"What is the best IPTV player for Roku?","acceptedAnswer":{"@type":"Answer","text":"The best IPTV player for Roku plays your Xtream Codes or M3U playlist on the TV, offers a trial, and does not sell channels. Bebz TV is an IPTV Roku player built for that. See https://bebz.tv/best-iptv-player-for-roku.html"}},
+      {"@type":"Question","name":"What is an IPTV Roku player?","acceptedAnswer":{"@type":"Answer","text":"An IPTV Roku player is an app on your Roku that plays your IPTV playlist (Xtream Codes or M3U). Bebz TV is that player. It does not sell IPTV content."}},
+      {"@type":"Question","name":"Does Bebz TV include movies or live channels?","acceptedAnswer":{"@type":"Answer","text":"No. Bebz TV is a media player only. You connect your own Xtream Codes or M3U playlist."}},
+      {"@type":"Question","name":"Is there a free trial?","acceptedAnswer":{"@type":"Answer","text":"Yes. 30 days, no credit card required."}},
+      {"@type":"Question","name":"Where do I install Bebz TV?","acceptedAnswer":{"@type":"Answer","text":"Install free from the Roku Channel Store, then activate on bebz.tv."}}
+    ]}
+  ]}
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080e1a;
+      --bg2:       #0d1528;
+      --card:      #111827;
+      --border:    #1e2d45;
+      --accent:    #3b82f6;
+      --accent2:   #60a5fa;
+      --text:      #f0f4ff;
+      --muted:     #8494b0;
+      --success:   #4ade80;
+      --error:     #f87171;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("background1.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-attachment: fixed;
+      background-color: #cccccc;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── GLOW ORBS ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: rgba(59,130,246,0.12);
+      top: -200px; left: -150px;
+    }
+    .orb-2 {
+      width: 400px; height: 400px;
+      background: rgba(96,165,250,0.08);
+      bottom: 100px; right: -100px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 48px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .nav-logo {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--accent2); }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px 24px 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.25);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 13px;
+      color: var(--accent2);
+      font-weight: 500;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent2);
+      border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero-brand {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 800;
+      font-size: clamp(84px, 14vw, 144px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 28px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .hero h1 {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 800;
+      font-size: clamp(42px, 7vw, 72px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 36px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent2), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 580px;
+      margin: 0 auto 48px;
+      font-weight: 300;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 0 30px rgba(59,130,246,0.3);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+      box-shadow: 0 0 40px rgba(59,130,246,0.4);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 24px 100px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(59,130,246,0.4);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 20px 24px 60px;
+    }
+
+    .section-divider h2 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--muted);
+    }
+
+    /* ── DEVICE MANAGEMENT SECTION ── */
+    #device-section {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      padding: 0 24px 100px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      padding: 32px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 60px rgba(0,0,0,0.4);
+    }
+
+    .hidden { display: none !important; }
+
+    .field-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      outline: none;
+      background: var(--bg2);
+      color: var(--text);
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.15s;
+    }
+
+    input:focus { border-color: var(--accent); }
+    input[readonly] { opacity: 0.8; cursor: default; }
+
+    .info-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+    .info-row:last-child { margin-bottom: 0; }
+
+    .info-label {
+      color: var(--muted);
+      width: 110px;
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: capitalize;
+      background: #1e2d45;
+      color: var(--muted);
+    }
+    .status-pill.active     { background: #14532d; color: var(--success); }
+    .status-pill.free_trial { background: #1e3a5f; color: var(--accent2); }
+    .status-pill.expired    { background: #450a0a; color: var(--error); }
+    .status-pill.inactive   { background: #1e2d45; color: var(--muted); }
+
+    .expiry-note {
+      font-size: 12px;
+      color: var(--accent2);
+      margin-left: 8px;
+    }
+    .expiry-note.warn { color: #f59e0b; }
+    .expiry-note.over { color: var(--error); }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: background 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    button:hover { background: #2563eb; }
+    button:disabled { background: #1e3a5f; color: #4b6a9a; cursor: not-allowed; }
+
+    button.secondary           { background: #1a2640; color: var(--muted); border: 1px solid var(--border); }
+    button.secondary:hover     { background: #243150; color: var(--text); }
+    button.secondary:disabled  { background: #111827; color: #4b6a9a; cursor: not-allowed; }
+
+    #msg {
+      margin-top: 10px;
+      font-size: 14px;
+      text-align: center;
+      color: var(--muted);
+      min-height: 20px;
+      line-height: 1.4;
+    }
+    #msg.error   { color: var(--error); }
+    #msg.success { color: var(--success); }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .divider-line {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 16px 0;
+    }
+
+    h2.card-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    p.card-logo {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 800;
+      font-size: 26px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    p.card-logo span { color: var(--accent2); }
+
+    .faq { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 20px 24px 80px; }
+    .faq h2 { font-family: 'DM Sans', sans-serif; font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 28px; }
+    .faq details { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; }
+    .faq summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+    .faq details p { color: var(--muted); font-size: 14px; margin-top: 10px; line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-left {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    .footer-left span { color: var(--accent2); }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.15s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      footer { flex-direction: column; text-align: center; }
+      .footer-copy { text-align: center; }
+    }
+
+  </style>
+</head>
+
+<body>
+
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="/"><img src="logo.png" alt="Bebz TV" style="height:80px;display:block;" /></a>
+  <ul class="nav-links">
+    <li><a href="/#features">Features</a></li>
+    <li><a href="/#pricing">Pricing</a></li>
+    <li><a href="/#faq">FAQ</a></li>
+    <li><a href="/best-iptv-player-for-roku.html">Best IPTV for Roku</a></li>
+    <li><a href="/about.html">About</a></li>
+    <li><a href="/contact.html">Contact</a></li>
+    <li><a href="/#device-section">Manage Device</a></li>
+    <li><a href="/arabic/">Arabic IPTV</a></li>
+    <li><a href="mailto:support@bebz.tv">Support</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-brand">BEBZ TV</div>
+  <h1>Best IPTV Roku player for <span>your own playlist</span></h1>
+
+  <!-- Checkmarks -->
+  <div style="display:inline-flex;flex-direction:column;gap:10px;margin-bottom:36px;text-align:left;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:12px;padding:20px 28px;">
+    <div style="display:flex;align-items:center;gap:10px;font-size:30px;color:#c9d3e8;"><span style="color:#4ade80;font-size:36px;">✅</span><span><strong style="color:#f0f4ff;">30-day free trial, no credit card required</strong></span></div>
+    <div style="display:flex;align-items:center;gap:10px;font-size:30px;color:#c9d3e8;"><span style="color:#4ade80;font-size:36px;">✅</span><span><strong style="color:#f0f4ff;">Xtream Codes or M3U playlist</strong></span></div>
+    <div style="display:flex;align-items:center;gap:10px;font-size:30px;color:#c9d3e8;"><span style="color:#4ade80;font-size:36px;">✅</span><span><strong style="color:#f0f4ff;">Watch live TV, Movies, and Series</strong></span></div>
+    <div style="display:flex;align-items:center;gap:10px;font-size:30px;color:#c9d3e8;"><span style="color:#4ade80;font-size:36px;">✅</span><span><strong style="color:#f0f4ff;">No content included</strong></span></div>
+  </div>
+
+</section>
+
+<footer>
+  <div class="footer-left"><img src="logo.png" alt="Bebz TV" style="height:40px;display:block;" /></div>
+  <div class="footer-links">
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms of Use</a>
+    <a href="/terms-of-sale.html">Terms of Sale</a>
+    <a href="/refund.html">Refund Policy</a>
+    <a href="/about.html">About</a>
+    <a href="/contact.html">Contact</a>
+    <a href="mailto:support@bebz.tv">support@bebz.tv</a>
+    <a href="https://x.com/bebzTV" target="_blank">𝕏 @BebzTV</a>
+  </div>
+  <div class="footer-copy">© 2026 Bebz TV. All rights reserved.</div>
+</footer>
+
+</body>
+</html>

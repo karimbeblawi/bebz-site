@@ -1,7 +1,9 @@
 {
   "rewrites": [
     { "source": "/arabic", "destination": "/arabic/index.html" },
-    { "source": "/arabic/", "destination": "/arabic/index.html" }
+    { "source": "/arabic/", "destination": "/arabic/index.html" },
+    { "source": "/arabic/help", "destination": "/arabic/help.html" },
+    { "source": "/ad", "destination": "/ad.html" }
   ],
   "headers": [
     {
